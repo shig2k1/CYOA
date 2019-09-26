@@ -8434,7 +8434,7 @@ vuetify@^2.0.17:
   version "2.0.17"
   resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-2.0.17.tgz#824dc9e640fc249a4fe37a1757206dbc9fed3492"
 
-vuex-class-component@^2.0.2:
+vuex-class-component@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/vuex-class-component/-/vuex-class-component-2.0.4.tgz#091749b323a3f3a8a5f052bd1a1520d387edfc8a"
   dependencies:

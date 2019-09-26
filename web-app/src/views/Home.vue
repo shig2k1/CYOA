@@ -3,23 +3,39 @@
     .title-bar
     .main
       .map-area
-        p map
+        game-map
+        
       .map-detail
-        p detail
+        pre {{ mapStore.name }}
+        button(@click="changeName") Change the name
       .map-items
         p items
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+import { Component, Vue } from 'vue-property-decorator'
+import { createProxy } from 'vuex-class-component'
+
+// import the store and required map module
+import { store } from '../store'
+import MapStore from '../store/modules/map.store'
+
+import GameMap from '@/components/GameMap.vue' // @ is an alias to /src
 
 @Component({
   components: {
-    HelloWorld,
+    GameMap,
   },
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+  // instanciate mapStore proxy locally
+  private mapStore = createProxy(store, MapStore)
+
+  private changeName() {
+    this.mapStore.changeName('FUCK!')
+    this.mapStore.name = "shit";
+  }
+}
 </script>
 
 <style lang="scss" scoped>

@@ -1,43 +1,38 @@
 <template lang="pug">
-  .root
-    h1 Hello world!
-    pre {{ value }}
+  canvas#game-map()
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { createProxy } from 'vuex-class-component'
+
+// import the store and required map module
+import { store } from '../store'
+import MapStore from '../store/modules/map.store'
 
 @Component
 export default class HelloWorld extends Vue {
+  // instanciate mapStore proxy locally
+  private mapStore = createProxy(store, MapStore)
+  
+  
   private value = 'This is a test... not sure about having to mark everything as private or public - that should be implicit'
 
   @Prop() private msg!: string
 
-  private mounted() {
-    this.$log.debug('Debugging')
-    this.$log.info('info')
-    this.$log.warn('warn')
-    this.$log.error('error')
-    this.$log.fatal('fatal!')
-  }
 
+
+  private mounted() {
+    // create axis
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+    #game-map {
+        background:red;
+        width: 100%;
+        height: 100%;
+    }
 </style>
