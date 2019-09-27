@@ -9,14 +9,13 @@ import { MAP_CHUNK_SIZE } from '@/config'
 export default class Map {
   private chunks:Dictionary<MapTile[][]> = {}
 
-  constructor (width: number, height: number) {
-    this.width = width
-    this.height = height
+  constructor () {
     this.startNewMap()
   }
 
-  public width: number
-  public height: number
+  public get map () {
+    return this.chunks
+  }
 
   private createEmptyChunk(width: number, height: number, offset: Vector): MapTile[][] {
     let data:MapTile[][] = []
@@ -32,8 +31,9 @@ export default class Map {
     return data
   }
 
-  private createNewChunk(offset:Vector, chunk: MapTile[][]) {
+  private createNewChunk(offset:Vector) {
     const key = `${offset[0]}:${offset[1]}`
+    let chunk = this.createEmptyChunk(MAP_CHUNK_SIZE, MAP_CHUNK_SIZE, offset)
     this.chunks = {
       ...this.chunks,
       [key]: chunk
@@ -41,12 +41,10 @@ export default class Map {
   }
 
   public startNewMap() {
-    this.createNewChunk([0,0], this.createEmptyChunk(MAP_CHUNK_SIZE, MAP_CHUNK_SIZE, [0, 0]))
+    this.createNewChunk([0, 0])
   }
 
   public serialize () {
     return JSON.stringify(this.chunks)
   }
-
 }
-

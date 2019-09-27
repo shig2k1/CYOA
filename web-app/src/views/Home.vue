@@ -6,7 +6,7 @@
         game-map
         
       .map-detail
-        pre {{ mapStore.name }}
+        pre {{ mapStore.map }}
         button(@click="changeName") Change the name
       .map-items
         p items
@@ -34,6 +34,10 @@ export default class Home extends Vue {
   private changeName() {
     this.mapStore.changeName('FUCK!')
     this.mapStore.name = 'shit'
+  }
+
+  private mounted() {
+    this.mapStore.createNewMap()
   }
 }
 </script>

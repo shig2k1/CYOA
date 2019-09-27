@@ -1,4 +1,4 @@
-import { createModule, mutation, action, createProxy } from 'vuex-class-component'
+import { createModule, mutation, action, getter, createProxy } from 'vuex-class-component'
 
 import mapApi from '@/api/map'
 
@@ -13,11 +13,23 @@ const VuexModule = createModule({
 })
 
 export default class MapStore extends VuexModule {
-  public mapData: Dictionary<MapTile> = {}
+  private map: Map
 
+  public mapStr: string = ''
+  @getter public mapData: Dictionary<MapTile[][]> = {}
   public name = 'test'
 
+  constructor() {
+    super()
+    this.map = new Map()
+  }
+
   // initial load
+  @action public async createNewMap () {
+    this.map.startNewMap()
+    this.mapStr = this.map.serialize()
+  }
+
   @action public async loadFromLocalStore() {
     this.mapData = await mapApi.get('mapData') || {}
   }

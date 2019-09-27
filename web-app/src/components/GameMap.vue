@@ -3,13 +3,18 @@
     canvas#game-map(ref="canvas" 
       :width="canvasSize" 
       :height="canvasSize"
+      :class="{ width: size, height: size }"
       @mousedown="mousedown"
       @mouseup="mouseup"
       @mouseenter="mouseenter" 
       @mouseleave="mouseleave" 
       @mousemove="mousemove")
 
-    div {{ vpOffset }}
+    div offset {{ vpOffset }}
+    div highlight {{ highlightCoords }}
+    div chunkArrayPosition {{ chunkGridXY }}
+    div mouse {{ mouseGridCoords }}
+    div cursor {{ cursorMapPosition }}
         
 </template>
 
@@ -46,9 +51,8 @@ export default class HelloWorld extends Vue {
   private canvas!: HTMLCanvasElement
   private ctx!: CanvasRenderingContext2D | null
 
-  private mapGridSize = 5                        // how big a map tile should be
+  private mapGridSize = 21                        // how big a map tile should be
 
-  private selectedCoords: Vector | null = null     // currently selected tile
   private vpOffset: Vector = [ 0, 0 ]              // viewport offset
   private vpZoom = 1                               // viewport zoom
   private tileSize = 0
@@ -60,18 +64,25 @@ export default class HelloWorld extends Vue {
   private top = 0
   private left = 0
 
+  private chunkGridXY: Vector | null = null       // chunk x, y position
+  private mouseGridCoords: Vector | null = null   // nouse
+  private highlightCoords: Vector | null = null   // relative mouse/grid coords
+  private selectedCoords: Vector | null = null    // currently selected tile
   private cursorMapPosition: Vector | null = null // where the cursor is on the map (or not)
 
-  private canvasSize = 500
+  private canvasSize = 700
 
   // key handler
   private keyHander!: any
 
   // mouse handler
   private isMouseDown = false
+  private isMouseOver = false
 
   // animation frame
   private lastRender = 0
+
+  private get size () { return `${this.canvasSize}px` }
 
   private get axisX() {
     return this.centerX + (this.tileSize * this.vpOffset[0])
@@ -104,33 +115,70 @@ export default class HelloWorld extends Vue {
   }
 
   private drawGridCell(coords: Vector) {
+    return this.drawCell(coords, GRID_COLOR)
+  }
+
+  private drawCell(coords: Vector, color: string) {
+    if (!coords) return
     const x1 = coords[0] * this.tileSize
     const y1 = coords[1] * this.tileSize
     const x2 = x1 + this.tileSize
     const y2 = y1 + this.tileSize
 
-    this.drawLine([x1, y1], [x2, y1], GRID_COLOR)
-    this.drawLine([x2, y1], [x2, y2], GRID_COLOR)
-    this.drawLine([x2, y2], [x1, y2], GRID_COLOR)
-    this.drawLine([x1, y2], [x1, y1], GRID_COLOR)
+    this.drawLine([x1, y1], [x2, y1], color)
+    this.drawLine([x2, y1], [x2, y2], color)
+    this.drawLine([x2, y2], [x1, y2], color)
+    this.drawLine([x1, y2], [x1, y1], color)
   }
 
-  private drawTile(coords: Vector, border: string = '#FF0000') {
-    return
+  private highlight(coords:Vector) {
+
+  }
+
+  private drawTile(coords: Vector, fill: string = '#FF0000') {
+    if (!coords) return
+    this.ctx.fillStyle = fill
+    const x = coords[0] * this.tileSize
+    const y = coords[1] * this.tileSize
+    this.ctx.fillRect(x, y, this.tileSize, this.tileSize)
+  }
+
+  private cursorToGrid(cursor:Vector):Vector {
+    
+    return 
   }
 
   // MOUSE EVENTS
   private mousemove(event: MouseEvent) {
     this.cursorMapPosition = [ event.clientX - this.left, event.clientY - this.top ]
     this.$log.debug('event: ', this.cursorMapPosition)
+    if (this.isMouseOver) {
+      const hGridSize = Math.floor(this.mapGridSize / 2)
+      let offsetX = Math.floor(this.vpOffset[0] + hGridSize)
+      let offsetY = Math.floor(this.vpOffset[1] + hGridSize)
+      this.mouseGridCoords = [
+        Math.floor(this.cursorMapPosition[0] / this.tileSize),
+        Math.floor(this.cursorMapPosition[1] / this.tileSize)
+      ]
+      this.highlightCoords = [
+        this.mouseGridCoords[0] - offsetX,
+        this.mouseGridCoords[1] - offsetY
+      ]
+      this.chunkGridXY = [
+        this.highlightCoords[0] + hGridSize,
+        this.highlightCoords[1] + hGridSize,
+      ]
+    } 
+    
     if (this.isMouseDown) this.$log.debug('dragging!')
   }
 
   private mouseenter() {
+    this.isMouseOver = true
   }
 
   private mouseleave() {
-    this.$log.debug('mouse leave')
+    this.isMouseOver = true
     this.cursorMapPosition = null
   }
 
@@ -152,6 +200,8 @@ export default class HelloWorld extends Vue {
     if (!this.ctx) return
     this.ctx.clearRect(0, 0, this.width, this.height)
     this.drawGrid()
+
+    this.drawTile(this.mouseGridCoords, 'rgba(255, 255, 255, 0.3)')
   }
 
   private loop(timestamp: number) {
@@ -164,16 +214,8 @@ export default class HelloWorld extends Vue {
     window.requestAnimationFrame(this.loop)
   }
 
-  keyboardAction:Dictionary<() => void> = {
-    w: () => {
-      this.vpOffset = [0, this.vpOffset[1] - 1]
-      this.$log.debug('FFFFF')
-    },
-    a: () => this.vpOffset = [this.vpOffset[0] - 1, 0],
-    s: () => this.vpOffset = [0, this.vpOffset[1] + 1],
-    d: () => this.vpOffset = [this.vpOffset[0] + 1, 0],
-  }
 
+  // handle the canvas movement with keyboard
   private onKeyPress(event: KeyboardEvent) {
     switch (event.key) {
       case 'w': return this.vpOffset = [this.vpOffset[0], this.vpOffset[1] - 1]
@@ -216,7 +258,5 @@ export default class HelloWorld extends Vue {
     }
     #game-map {
         background:black;
-        width: 500px;
-        height: 500px;
     }
 </style>
