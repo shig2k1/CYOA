@@ -26,7 +26,7 @@ import { createProxy } from 'vuex-class-component'
 import { store } from '../store'
 import MapStore from '../store/modules/map.store'
 
-import { Vector } from '../types'
+import { Vector, MapTile } from '../types'
 import { Dictionary } from 'vue-router/types/router'
 
 const GRID_COLOR = '#AAA'
@@ -51,7 +51,7 @@ export default class HelloWorld extends Vue {
   private canvas!: HTMLCanvasElement
   private ctx!: CanvasRenderingContext2D | null
 
-  private mapGridSize = 21                        // how big a map tile should be
+  private mapGridSize = 51                        // how big a map tile should be
 
   private vpOffset: Vector = [ 0, 0 ]              // viewport offset
   private vpZoom = 1                               // viewport zoom
@@ -81,6 +81,9 @@ export default class HelloWorld extends Vue {
 
   // animation frame
   private lastRender = 0
+
+  // chunk
+  private chunk:MapTile[][] = []
 
   private get size () { return `${this.canvasSize}px` }
 
@@ -131,10 +134,6 @@ export default class HelloWorld extends Vue {
     this.drawLine([x1, y2], [x1, y1], color)
   }
 
-  private highlight(coords:Vector) {
-
-  }
-
   private drawTile(coords: Vector, fill: string = '#FF0000') {
     if (!coords) return
     this.ctx.fillStyle = fill
@@ -143,19 +142,15 @@ export default class HelloWorld extends Vue {
     this.ctx.fillRect(x, y, this.tileSize, this.tileSize)
   }
 
-  private cursorToGrid(cursor:Vector):Vector {
-    
-    return 
-  }
-
   // MOUSE EVENTS
   private mousemove(event: MouseEvent) {
+    this.getDims() // update screen info
     this.cursorMapPosition = [ event.clientX - this.left, event.clientY - this.top ]
-    this.$log.debug('event: ', this.cursorMapPosition)
+    // figure out coords relative to grid & data
     if (this.isMouseOver) {
       const hGridSize = Math.floor(this.mapGridSize / 2)
-      let offsetX = Math.floor(this.vpOffset[0] + hGridSize)
-      let offsetY = Math.floor(this.vpOffset[1] + hGridSize)
+      const offsetX = Math.floor(this.vpOffset[0] + hGridSize)
+      const offsetY = Math.floor(this.vpOffset[1] + hGridSize)
       this.mouseGridCoords = [
         Math.floor(this.cursorMapPosition[0] / this.tileSize),
         Math.floor(this.cursorMapPosition[1] / this.tileSize)
@@ -183,7 +178,8 @@ export default class HelloWorld extends Vue {
   }
 
   private mousedown() {
-    this.$log.debug('mousedown')
+    // place a tile :D
+    this.chunk = [this.chunkGridXY[0]][this.chunkGridXY[1]]
     this.isMouseDown = true
   }
 
@@ -214,7 +210,6 @@ export default class HelloWorld extends Vue {
     window.requestAnimationFrame(this.loop)
   }
 
-
   // handle the canvas movement with keyboard
   private onKeyPress(event: KeyboardEvent) {
     switch (event.key) {
@@ -225,23 +220,29 @@ export default class HelloWorld extends Vue {
     }
   }
 
+  private getDims() {
+    const { width, height, top, left } = this.canvas.getBoundingClientRect()
+    this.width = width
+    this.height = height        
+    this.top = top
+    this.left = left
+  }
+
   private mounted() {
     // get canvas ref
     this.canvas = this.$refs.canvas as HTMLCanvasElement
     this.ctx = this.canvas.getContext('2d')
 
-    const { width, height, top, left } = this.canvas.getBoundingClientRect()
-
-    this.tileSize = width / this.mapGridSize
-    this.centerX = width / 2
-    this.centerY = height / 2
-    this.width = width
-    this.height = height
-    this.top = top
-    this.left = left
+    this.getDims()
+    
+    this.tileSize = this.width / this.mapGridSize
+    this.centerX = this.width / 2
+    this.centerY = this.height / 2
 
     window.requestAnimationFrame(this.loop)
     this.keyHander = document.addEventListener('keypress', this.onKeyPress)
+
+    this.chunk = this.mapStore.mapData.chunks['0:0']
   }
 
   beforeDestroy() {
