@@ -15,6 +15,7 @@
     "object-literal-sort-keys": false,
     "semicolon": false,
     "ordered-imports": false,
-    "quotemark": [true, "single"]
+    "quotemark": [true, "single"],
+    "curly": false
   }
 }

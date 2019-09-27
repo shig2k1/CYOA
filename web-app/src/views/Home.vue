@@ -33,7 +33,7 @@ export default class Home extends Vue {
 
   private changeName() {
     this.mapStore.changeName('FUCK!')
-    this.mapStore.name = "shit";
+    this.mapStore.name = 'shit'
   }
 }
 </script>

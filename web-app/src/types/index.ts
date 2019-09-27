@@ -1,29 +1,34 @@
-type Dictionary<t> = {
-  [key: string] : t
+interface Dictionary<t> {
+  [key: string]: t,
 }
 
 type Vector = [ number, number ]
 
-type Item = {
+interface Item  {
   id: string,
   name: string,
-  description: string
+  description: string,
 }
 
-type Door = {
+interface Door {
   sideA: Vector,
   sideB: Vector,
   locked: boolean,
-  keyId: string // <-- item id
+  keyId: string, // <-- item id
 }
 
-type Room = {
-  doors: Dictionary<Door>
+interface Room {
+  doors: Dictionary<Door>,
 }
 
-type MapTile = {
+interface MapChunk {
+  
+}
+
+interface MapTile {
   coords: Vector,
-  room: Dictionary<Room>
+  room?: Dictionary<Room>,
+  items?: Dictionary<Item>
 }
 
-export { Dictionary, Vector, MapTile, Item, Door, Room }
+export { Dictionary, Vector, MapChunk, MapTile, Item, Door, Room }

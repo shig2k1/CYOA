@@ -2,20 +2,20 @@
 import localForage from 'localforage'
 
 class Map {
-  store:any
-  
-  // data saved into localforage data file
-  async get (key:string) {
-    return this.store.getItem(key)
-  }
-  async set (key:string, value:any) {
-    this.store.setItem(key, value)
+  private store: any
+
+  constructor() {
+    this.store = localForage.createInstance({
+      name: 'CYOA',
+    })
   }
 
-  constructor () {
-    this.store = localForage.createInstance({
-      name: 'CYOA'
-    })
+  // data saved into localforage data file
+  public async get(key: string) {
+    return this.store.getItem(key)
+  }
+  public async set(key: string, value: any) {
+    this.store.setItem(key, value)
   }
 }
 
