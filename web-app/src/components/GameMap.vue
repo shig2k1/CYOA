@@ -11,10 +11,13 @@
       @mousemove="mousemove")
 
     div offset {{ vpOffset }}
-    div highlight {{ highlightCoords }}
-    div chunkArrayPosition {{ chunkGridXY }}
+    div highlight {{ offsetGridCoords }}
+    div vpGridXY {{ vpGridXY }}
+    div vpChunkXY {{ offsetChunkCoords }}
     div mouse {{ mouseGridCoords }}
     div cursor {{ cursorMapPosition }}
+    div internalGridCoordss {{ internalGridCoords }}
+    div dataChunkOffset {{ dataChunkOffset }}
         
 </template>
 
@@ -28,6 +31,7 @@ import MapStore from '../store/modules/map.store'
 
 import { Vector, MapTile } from '../types'
 import { Dictionary } from 'vue-router/types/router'
+import { MAP_CHUNK_SIZE } from '../config'
 
 const GRID_COLOR = '#AAA'
 
@@ -64,11 +68,14 @@ export default class HelloWorld extends Vue {
   private top = 0
   private left = 0
 
-  private chunkGridXY: Vector | null = null       // chunk x, y position
+  private vpGridXY: Vector | null = null       // chunk x, y position
   private mouseGridCoords: Vector | null = null   // nouse
-  private highlightCoords: Vector | null = null   // relative mouse/grid coords
+  private offsetGridCoords: Vector | null = null   // relative mouse/grid coords from offset origin
+  private offsetChunkCoords: Vector | null = null // which map chunk
   private selectedCoords: Vector | null = null    // currently selected tile
-  private cursorMapPosition: Vector | null = null // where the cursor is on the map (or not)
+  private cursorMapPosition: Vector | null = null // where the cursor is on the map (or not)this.mouseGridCoords[0]
+  private internalGridCoords: Vector | null = null // where in the chunk array the cursor is
+  private dataChunkOffset: Vector | null = null // which chunk is active
 
   private canvasSize = 700
 
@@ -118,7 +125,9 @@ export default class HelloWorld extends Vue {
   }
 
   private drawGridCell(coords: Vector) {
-    return this.drawCell(coords, GRID_COLOR)
+    const hChunk = Math.floor(MAP_CHUNK_SIZE / 2)
+    const isMapChunkOrigin = (coords[0] + hChunk - this.vpOffset[0]) % 10 === 0 && (coords[1] + hChunk - this.vpOffset[1]) % 10 === 0
+    return this.drawCell(coords, isMapChunkOrigin ? 'blue' : 'gray')
   }
 
   private drawCell(coords: Vector, color: string) {
@@ -142,6 +151,18 @@ export default class HelloWorld extends Vue {
     this.ctx.fillRect(x, y, this.tileSize, this.tileSize)
   }
 
+  /**
+   * draw boundary indicator for the current chunk
+   * calculate centre position and offset relative to
+   * MAP_CHUNK_SIZE
+   *            |        _|_       |
+   *            |         |        |
+   *  */ 
+  private drawChunk(coords: Vector) {
+    if (!coords) return
+    //const 
+  }
+
   // MOUSE EVENTS
   private mousemove(event: MouseEvent) {
     this.getDims() // update screen info
@@ -151,17 +172,37 @@ export default class HelloWorld extends Vue {
       const hGridSize = Math.floor(this.mapGridSize / 2)
       const offsetX = Math.floor(this.vpOffset[0] + hGridSize)
       const offsetY = Math.floor(this.vpOffset[1] + hGridSize)
+      const hChunk = MAP_CHUNK_SIZE / 2
+
+      const tileMapSizeChunk = this.tileSize * MAP_CHUNK_SIZE
+
       this.mouseGridCoords = [
         Math.floor(this.cursorMapPosition[0] / this.tileSize),
         Math.floor(this.cursorMapPosition[1] / this.tileSize)
       ]
-      this.highlightCoords = [
+      this.offsetChunkCoords = [
+        offsetX,
+        offsetY
+      ]
+      this.offsetGridCoords = [
         this.mouseGridCoords[0] - offsetX,
         this.mouseGridCoords[1] - offsetY
       ]
-      this.chunkGridXY = [
-        this.highlightCoords[0] + hGridSize,
-        this.highlightCoords[1] + hGridSize,
+      this.vpGridXY = [
+        this.offsetGridCoords[0] + hGridSize,
+        this.offsetGridCoords[1] + hGridSize,
+      ]
+
+      // HOW DO I GET THE DATA CHUNK OFFSET?
+      this.dataChunkOffset = [
+        Math.round((this.offsetGridCoords[0]) / MAP_CHUNK_SIZE),
+        Math.round((this.offsetGridCoords[1]) / MAP_CHUNK_SIZE)
+      ]
+
+      // gets the position of the cell, relative to the data chunk
+      this.internalGridCoords = [
+        (this.mouseGridCoords[0] - this.vpOffset[0]) % 10,
+        (this.mouseGridCoords[1] - this.vpOffset[1]) % 10
       ]
     } 
     
@@ -179,7 +220,7 @@ export default class HelloWorld extends Vue {
 
   private mousedown() {
     // place a tile :D
-    this.chunk = [this.chunkGridXY[0]][this.chunkGridXY[1]]
+    
     this.isMouseDown = true
   }
 
@@ -198,6 +239,8 @@ export default class HelloWorld extends Vue {
     this.drawGrid()
 
     this.drawTile(this.mouseGridCoords, 'rgba(255, 255, 255, 0.3)')
+    
+    this.drawChunk(this.mouseGridCoords)
   }
 
   private loop(timestamp: number) {
@@ -242,7 +285,7 @@ export default class HelloWorld extends Vue {
     window.requestAnimationFrame(this.loop)
     this.keyHander = document.addEventListener('keypress', this.onKeyPress)
 
-    this.chunk = this.mapStore.mapData.chunks['0:0']
+    // this.chunk = this.mapStore.mapData.chunks['0:0']
   }
 
   beforeDestroy() {
