@@ -36,7 +36,7 @@ import { MAP_CHUNK_SIZE } from '../config'
 const GRID_COLOR = '#AAA'
 
 @Component
-export default class HelloWorld extends Vue {
+export default class GameMap extends Vue {
   // map will generate a starting chunk - array of fixed size with player at center
 
   // [  0,1,2
@@ -223,10 +223,14 @@ export default class HelloWorld extends Vue {
     
     this.isMouseDown = true
 
-    this.mapStore.addTile(this.dataChunkOffset, this.internalGridCoords)
+    this.mapStore.selectTile(this.offsetGridCoords)
+
+    // this.mapStore.addTile(this.dataChunkOffset, this.internalGridCoords)
+
+    //console.log(this.dataChunkOffset)
 
     // create data
-    console.log(`chunk${this.dataChunkOffset} @ ${this.internalGridCoords}`)
+    //console.log(`chunk${this.dataChunkOffset} @ ${this.internalGridCoords}`)
 
   }
 

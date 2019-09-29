@@ -6,7 +6,10 @@
         game-map
         
       .map-detail
-        pre {{ mapStore.map }}
+        game-tile-detail
+        
+        pre {{ mapStore.selectedCoord }}
+        
         button(@click="changeName") Change the name
       .map-items
         p items
@@ -21,10 +24,12 @@ import { store } from '../store'
 import MapStore from '../store/modules/map.store'
 
 import GameMap from '@/components/GameMap.vue' // @ is an alias to /src
+import GameTileDetail from '@/components/GameTileDetail.vue'
 
 @Component({
   components: {
     GameMap,
+    GameTileDetail,
   },
 })
 export default class Home extends Vue {
@@ -38,6 +43,10 @@ export default class Home extends Vue {
 
   private mounted() {
     this.mapStore.createNewMap()
+  }
+
+  public get mapInterestPoints () {
+    return 
   }
 }
 </script>
