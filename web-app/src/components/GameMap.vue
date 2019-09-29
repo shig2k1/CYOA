@@ -10,6 +10,7 @@
       @mouseleave="mouseleave" 
       @mousemove="mousemove")
 
+
     div offset {{ vpOffset }}
     div highlight {{ offsetGridCoords }}
     //div vpGridXY {{ vpGridXY }}
@@ -31,21 +32,12 @@ import MapStore from '../store/modules/map.store'
 
 import { Vector, MapTile } from '../types'
 import { Dictionary } from 'vue-router/types/router'
-import { MAP_CHUNK_SIZE } from '../config'
+import { MAP_CHUNK_SIZE, MAP_GRID_SIZE } from '../config'
 
 const GRID_COLOR = '#AAA'
 
 @Component
 export default class GameMap extends Vue {
-  // map will generate a starting chunk - array of fixed size with player at center
-
-  // [  0,1,2
-  //  0[0,0,0],
-  //  1[0,0,0],
-  //  2[0,0,0]
-  // ]
-
-
   // instanciate mapStore proxy locally
   private mapStore = createProxy(store, MapStore)
   private value = 'This is a test... not sure about having to mark everything as private or public - that should be implicit'
@@ -55,7 +47,8 @@ export default class GameMap extends Vue {
   private canvas!: HTMLCanvasElement
   private ctx!: CanvasRenderingContext2D | null
 
-  private mapGridSize = 81                        // how big a map tile should be
+  private mapGridSize = MAP_GRID_SIZE                        // how big a map tile should be
+  private hMapGridSize = Math.floor(this.mapGridSize / 2)
 
   private vpOffset: Vector = [ 0, 0 ]              // viewport offset
   private vpZoom = 1                               // viewport zoom
@@ -151,18 +144,6 @@ export default class GameMap extends Vue {
     this.ctx.fillRect(x, y, this.tileSize, this.tileSize)
   }
 
-  /**
-   * draw boundary indicator for the current chunk
-   * calculate centre position and offset relative to
-   * MAP_CHUNK_SIZE
-   *            |        _|_       |
-   *            |         |        |
-   *  */ 
-  private drawChunk(coords: Vector) {
-    if (!coords) return
-    //const 
-  }
-
   // MOUSE EVENTS
   private mousemove(event: MouseEvent) {
     this.getDims() // update screen info
@@ -249,8 +230,13 @@ export default class GameMap extends Vue {
     this.drawGrid()
 
     this.drawTile(this.mouseGridCoords, 'rgba(255, 255, 255, 0.3)')
-    
-    this.drawChunk(this.mouseGridCoords)
+
+    const offsetSelectedCoord:Vector = [
+      this.mapStore.selectedCoord[0] + this.vpOffset[0] + this.hMapGridSize,
+      this.mapStore.selectedCoord[1] + this.vpOffset[1] + this.hMapGridSize
+    ]
+
+    this.drawTile(offsetSelectedCoord, 'rgb(200, 200, 0)')
   }
 
   private loop(timestamp: number) {

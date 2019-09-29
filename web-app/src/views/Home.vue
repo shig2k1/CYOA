@@ -42,7 +42,7 @@ export default class Home extends Vue {
   }
 
   private mounted() {
-    this.mapStore.createNewMap()
+    this.mapStore.loadFromLocalStore()
   }
 
   public get mapInterestPoints () {

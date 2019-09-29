@@ -1,3 +1,4 @@
-const MAP_CHUNK_SIZE = 20
+const MAP_CHUNK_SIZE = 4
+const MAP_GRID_SIZE = 21
 
-export { MAP_CHUNK_SIZE }
+export { MAP_CHUNK_SIZE, MAP_GRID_SIZE }

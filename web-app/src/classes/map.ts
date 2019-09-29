@@ -9,10 +9,6 @@ import { MAP_CHUNK_SIZE } from '@/config'
 export default class Map {
   private chunks:Dictionary<MapTile[][]> = {}
 
-  constructor () {
-    this.startNewMap()
-  }
-
   public get map () {
     return this.chunks
   }
@@ -25,6 +21,7 @@ export default class Map {
         row.push({ 
           coords: [x, y]
         })
+        console.log('row', row)
       }
       data.push(row)
     }
@@ -42,10 +39,6 @@ export default class Map {
       ...this.chunks,
       [key]: chunk
     }
-  }
-
-  public startNewMap() {
-    this.createNewChunk([0, 0])
   }
 
   public serialize () {
