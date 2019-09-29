@@ -29,6 +29,7 @@ interface MapTile {
   coords: Vector,
   room?: Dictionary<Room>,
   items?: Dictionary<Item>
+  name?: string
 }
 
 export { Dictionary, Vector, MapChunk, MapTile, Item, Door, Room }

@@ -1,3 +1,3 @@
-const MAP_CHUNK_SIZE = 10
+const MAP_CHUNK_SIZE = 20
 
 export { MAP_CHUNK_SIZE }

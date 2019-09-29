@@ -17,13 +17,13 @@ export default class Map {
     return this.chunks
   }
 
-  private createEmptyChunk(width: number, height: number, offset: Vector): MapTile[][] {
+  public createEmptyChunk(width: number, height: number): MapTile[][] {
     let data:MapTile[][] = []
     for (let y = 0; y < height; y++) {
       let row:MapTile[] = []
       for (let x = 0; x < width; x++) {
         row.push({ 
-          coords: [x + offset[0], y + offset[1]]
+          coords: [x, y]
         })
       }
       data.push(row)
@@ -31,9 +31,13 @@ export default class Map {
     return data
   }
 
-  private createNewChunk(offset:Vector) {
+  public getChunk(offset: Vector): MapTile[][] {
+    return this.chunks[`${offset[0]}:${offset[1]}`]
+  }
+
+  public createNewChunk(offset:Vector) {
     const key = `${offset[0]}:${offset[1]}`
-    let chunk = this.createEmptyChunk(MAP_CHUNK_SIZE, MAP_CHUNK_SIZE, offset)
+    let chunk = this.createEmptyChunk(MAP_CHUNK_SIZE, MAP_CHUNK_SIZE)
     this.chunks = {
       ...this.chunks,
       [key]: chunk
