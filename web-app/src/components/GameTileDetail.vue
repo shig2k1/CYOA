@@ -1,13 +1,13 @@
 <template lang="pug">
   .game-tile-detail
     h1 Selected x: {{ x }} y: {{ y }}
-    h2 chunk: {{ chunkOffset }}
-    h2 coords: {{ chunkCoords }}
 
     v-btn(@click="createTile")
       | Create tile
 
-    pre {{ map }}
+    pre {{ offset }}
+
+    pre {{ test }}
 </template>
 
 <script lang="ts">
@@ -21,6 +21,8 @@
   import { Vector } from '../types'
 
   import { MAP_CHUNK_SIZE } from '../config'
+
+  import { chunkLocalCoords, chunkOffset, getChunkForRange, getMaxMinGridRange } from '../utils/map.helper'
 
   const hChunk = Math.floor(MAP_CHUNK_SIZE / 2)
 
@@ -37,28 +39,23 @@
       return this.mapStore.selectedCoord[1]
     }
 
-    private get map () {
+    private get offset () {
+      if (!this.mapStore.selectedCoord) return
+      return chunkOffset(this.mapStore.selectedCoord)
+    }
+
+    private get map() {
       return this.mapStore.mapData
     }
 
-    private get chunkOffset():Vector {
-      return [
-        Math.round(this.x / MAP_CHUNK_SIZE),
-        Math.round(this.y / MAP_CHUNK_SIZE)
-      ]
-    }
-
-    private get chunkCoords():Vector {
-      return [
-        (Math.abs((this.x + hChunk) % MAP_CHUNK_SIZE)),
-        (Math.abs((this.y + hChunk) % MAP_CHUNK_SIZE))
-      ]
+    private get test() {
+      return getChunkForRange(getMaxMinGridRange(this.mapStore.offset))
     }
 
     private createTile() {
       let data:IAddTile = {
-        chunkOffset: this.chunkOffset,
-        coords: this.chunkCoords,
+        chunkOffset: chunkOffset(this.mapStore.selectedCoord),
+        coords: chunkLocalCoords(this.mapStore.selectedCoord),
         tile: {
           name: 'test'
         }

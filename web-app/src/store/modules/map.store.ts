@@ -23,6 +23,8 @@ const map = new Map()
 
 export default class MapStore extends VuexModule {
   public selectedCoord: Vector = [0, 0]
+  public offset: Vector = [0, 0]
+
   public mapStr: string = ''
   @getter public mapData: Dictionary<MapTile[][]> = {}
   public name = 'test'
@@ -40,6 +42,12 @@ export default class MapStore extends VuexModule {
     return await this.updateName(name)
   }
 
+  @action public async setOffset(offset: Vector) {
+    // save the data
+    mapApi.set('offset', offset)
+    this.offset = offset
+  }
+
   @action public async addTile(payload: IAddTile) {
     let { chunkOffset, coords, tile } = payload
     // is there a chunk?
@@ -51,6 +59,7 @@ export default class MapStore extends VuexModule {
       ...chunk[coords[0]][coords[1]],
       ...tile
     }
+    
     // update the map
     this.mapData  = {
       ...this.mapData,
