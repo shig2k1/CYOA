@@ -22,7 +22,7 @@
 
   import { MAP_CHUNK_SIZE } from '../config'
 
-  import { chunkLocalCoords, chunkOffset, getChunkForRange, getMaxMinGridRange } from '../utils/map.helper'
+  import { chunkLocalCoords, chunkOffset, getChunksForRange, getMaxMinGridRange } from '../utils/map.helper'
 
   const hChunk = Math.floor(MAP_CHUNK_SIZE / 2)
 
@@ -49,7 +49,7 @@
     }
 
     private get test() {
-      return getChunkForRange(getMaxMinGridRange(this.mapStore.offset))
+      return getChunksForRange(getMaxMinGridRange(this.mapStore.offset))
     }
 
     private createTile() {

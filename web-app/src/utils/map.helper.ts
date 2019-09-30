@@ -38,8 +38,8 @@ function getMaxMinGridRange(coords: Vector): Vector[] {
   ]
 }
 
-// chunk range
-function getChunkForRange(xyMinMax: Vector[]) {
+// from the extremes of the grid, work out what chunks to load
+function getChunksForRange(xyMinMax: Vector[]) {
   if (!xyMinMax) return
 
   const xMin = xyMinMax[0][0]
@@ -60,7 +60,7 @@ function getChunkForRange(xyMinMax: Vector[]) {
     }
   }
 
-  return { requiredChunks, xRange, yRange }
+  return requiredChunks
 }
 
-export { chunkLocalCoords, chunkOffset, getMaxMinGridRange, getChunkForRange }
+export { chunkLocalCoords, chunkOffset, getMaxMinGridRange, getChunksForRange }

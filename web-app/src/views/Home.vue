@@ -26,6 +26,8 @@ import MapStore from '../store/modules/map.store'
 import GameMap from '@/components/GameMap.vue' // @ is an alias to /src
 import GameTileDetail from '@/components/GameTileDetail.vue'
 
+import { chunkLocalCoords, chunkOffset, getChunksForRange, getMaxMinGridRange } from '../utils/map.helper'
+
 @Component({
   components: {
     GameMap,
@@ -42,7 +44,8 @@ export default class Home extends Vue {
   }
 
   private mounted() {
-    this.mapStore.loadFromLocalStore()
+    let chunks = getChunksForRange(getMaxMinGridRange(this.mapStore.offset))
+    this.mapStore.loadFromLocalStore(chunks)
   }
 
   public get mapInterestPoints () {

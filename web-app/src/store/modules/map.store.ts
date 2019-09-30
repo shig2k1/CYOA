@@ -34,8 +34,11 @@ export default class MapStore extends VuexModule {
     this.selectedCoord = coord
   }
 
-  @action public async loadFromLocalStore() {
-    this.mapData = await mapApi.get('mapData') || {}
+  @action public async loadFromLocalStore(chunks: string[]) {
+    this.mapData = {
+      ...this.mapData,
+      ...await mapApi.loadMapChunks(chunks) || {}
+    }
   }
 
   @action public async changeName(name: string) {
