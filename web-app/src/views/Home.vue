@@ -1,7 +1,7 @@
 <template lang="pug">
   .game-wrapper
     .title-bar
-    .main
+    .main(v-if="mapStore")
       .map-area
         game-map
         
@@ -44,8 +44,7 @@ export default class Home extends Vue {
   }
 
   private mounted() {
-    let chunks = getChunksForRange(getMaxMinGridRange(this.mapStore.offset))
-    this.mapStore.loadFromLocalStore(chunks)
+    this.mapStore.initGameMap()
   }
 
   public get mapInterestPoints () {

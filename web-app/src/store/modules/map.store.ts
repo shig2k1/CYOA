@@ -7,6 +7,8 @@ import Map from '@/classes/map'
 import { Dictionary, MapTile, Vector } from '../../types'
 import { MAP_CHUNK_SIZE } from '../../config'
 
+import { chunkLocalCoords, chunkOffset, getMaxMinGridRange, getChunksForRange } from '../../utils/map.helper'
+
 const VuexModule = createModule({
   namespaced: true,
   strict: false,
@@ -16,22 +18,28 @@ const VuexModule = createModule({
 export interface IAddTile {
   chunkOffset: Vector
   coords: Vector
-  tile:MapTile
+  tile: MapTile
 }
 
 const map = new Map()
 
 export default class MapStore extends VuexModule {
   public selectedCoord: Vector = [0, 0]
-  public offset: Vector = [0, 0]
+  @getter public offset: Vector = [0, 0]
 
   public mapStr: string = ''
-  @getter public mapData: Dictionary<MapTile[][]> = {}
+  @getter public mapData: Dictionary<(MapTile | number)[][]> = {}
   public name = 'test'
 
   // initial load
   @mutation public selectTile(coord:Vector) {
     this.selectedCoord = coord
+  }
+
+  @action public async initGameMap () {
+    // this.offset = await mapApi.get('offset') || [ 0, 0 ]
+    let chunks = getChunksForRange(getMaxMinGridRange(this.offset))
+    if (chunks) this.loadFromLocalStore(chunks)
   }
 
   @action public async loadFromLocalStore(chunks: string[]) {
@@ -52,21 +60,18 @@ export default class MapStore extends VuexModule {
   }
 
   @action public async addTile(payload: IAddTile) {
-    let { chunkOffset, coords, tile } = payload
+    const { chunkOffset, coords, tile } = payload
     // is there a chunk?
-    let key = `${chunkOffset[0]}:${chunkOffset[1]}`
+    const key = `${chunkOffset[0]}:${chunkOffset[1]}`
     let chunk = this.mapData[key]
     if (!chunk) chunk = map.createEmptyChunk(MAP_CHUNK_SIZE, MAP_CHUNK_SIZE)
     // update the chunk data
-    chunk[coords[0]][coords[1]] = {
-      ...chunk[coords[0]][coords[1]],
-      ...tile
-    }
+    chunk[coords[1]][coords[0]] = { ...tile }
     
     // update the map
     this.mapData  = {
       ...this.mapData,
-      [key]: chunk
+      [key]: chunk,
     }
     // save the data
     mapApi.set('mapData', this.mapData)

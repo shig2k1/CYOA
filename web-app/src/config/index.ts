@@ -1,4 +1,4 @@
-const MAP_CHUNK_SIZE = 2
+const MAP_CHUNK_SIZE = 4
 const MAP_HCHUNK_SIZE = Math.floor(MAP_CHUNK_SIZE / 2)
 const MAP_GRID_SIZE = 41
 const MAP_HGRID_SIZE = Math.floor(MAP_GRID_SIZE / 2)

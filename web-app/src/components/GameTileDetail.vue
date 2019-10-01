@@ -6,8 +6,6 @@
       | Create tile
 
     pre {{ offset }}
-
-    pre {{ test }}
 </template>
 
 <script lang="ts">
@@ -24,7 +22,7 @@
 
   import { chunkLocalCoords, chunkOffset, getChunksForRange, getMaxMinGridRange } from '../utils/map.helper'
 
-  const hChunk = Math.floor(MAP_CHUNK_SIZE / 2)
+  const hChunk = Math.ceil(MAP_CHUNK_SIZE / 2)
 
   @Component
   export default class GameTileDetail extends Vue {
@@ -39,7 +37,7 @@
       return this.mapStore.selectedCoord[1]
     }
 
-    private get offset () {
+    private get offset() {
       if (!this.mapStore.selectedCoord) return
       return chunkOffset(this.mapStore.selectedCoord)
     }
@@ -60,6 +58,9 @@
           name: 'test'
         }
       }
+
+      console.log(chunkOffset(this.mapStore.selectedCoord), chunkLocalCoords(this.mapStore.selectedCoord))
+
       this.mapStore.addTile(data)
     }
   }

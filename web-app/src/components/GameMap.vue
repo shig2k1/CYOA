@@ -10,15 +10,18 @@
       @mouseleave="mouseleave" 
       @mousemove="mousemove")
 
-    pre x max/min {{ xMaxMin }}
-    pre y max/min {{ yMaxMin }}
+    table
+      tr
+        td {{ offsetGridCoords }}
+        td {{ chunkoffset }}
+        td {{ chunkgridxy }}
 
-    pre {{ centerX }}
-        
+    pre {{ visibleChunks }}
+
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { createProxy } from 'vuex-class-component'
 
 // import the store and required map module
@@ -27,10 +30,10 @@ import MapStore from '../store/modules/map.store'
 
 import { Vector, MapTile } from '../types'
 import { Dictionary } from 'vue-router/types/router'
-import { MAP_CHUNK_SIZE, MAP_GRID_SIZE } from '../config'
+import { MAP_CHUNK_SIZE, MAP_GRID_SIZE, MAP_HCHUNK_SIZE, MAP_HGRID_SIZE } from '../config'
 
 
-import { chunkLocalCoords, chunkOffset, getMaxMinGridRange } from '../utils/map.helper'
+import { chunkLocalCoords, chunkOffset, getMaxMinGridRange, getChunksForRange, visibleOrigin } from '../utils/map.helper'
 
 const GRID_COLOR = '#AAA'
 
@@ -72,6 +75,8 @@ export default class GameMap extends Vue {
   private xMaxMin: Vector = [ 0, 0 ]
   private yMaxMin: Vector = [ 0, 0 ]
 
+  // visible chunk addresses
+  private visibleChunks: string[] = []
 
   private canvasSize = 600
 
@@ -88,6 +93,16 @@ export default class GameMap extends Vue {
   // chunk
   private chunk:MapTile[][] = []
 
+  @Watch('mapStore.offset') onMapOriginChange() {
+
+  }
+
+
+  @Watch('mapStore.mapData') onMapDataChange() {
+    this.setMapChunkRange()
+    this.draw()
+  }
+
   private get size () { return `${this.canvasSize}px` }
 
   private get axisX() {
@@ -96,6 +111,20 @@ export default class GameMap extends Vue {
 
   private get axisY() {
     return this.centerY + (this.tileSize * this.mapStore.offset[1])
+  }
+
+  private get origin() {
+    return visibleOrigin(this.mapStore.offset)
+  }
+
+  get chunkoffset () {
+    if (!this.offsetGridCoords) return
+    return chunkOffset(this.offsetGridCoords)
+  }
+
+  get chunkgridxy () {
+    if (!this.offsetGridCoords) return
+    return chunkLocalCoords(this.offsetGridCoords)
   }
 
   private drawGrid() {
@@ -145,6 +174,21 @@ export default class GameMap extends Vue {
     const x = coords[0] * this.tileSize
     const y = coords[1] * this.tileSize
     this.ctx.fillRect(x, y, this.tileSize, this.tileSize)
+  }
+
+  private drawMapTile(coords: Vector, fill: string = '#FF0000') {
+    if (!coords || !this.ctx) return
+    this.ctx.fillStyle = fill
+    this.ctx.fillRect(coords[0] * this.tileSize, coords[1] * this.tileSize, this.tileSize, this.tileSize)
+
+    //this.ctx.fillRect(((((coords[0] - MAP_HCHUNK_SIZE) + MAP_HGRID_SIZE + this.mapStore.offset[0])) * this.tileSize), (((coords[1] - MAP_HCHUNK_SIZE) + MAP_HGRID_SIZE + this.mapStore.offset[1]) * this.tileSize), this.tileSize, this.tileSize)
+
+
+    //this.ctx.fillRect((coords[0] - MAP_HCHUNK_SIZE) + (MAP_HGRID_SIZE) * this.tileSize, ((coords[1] - MAP_HCHUNK_SIZE) + MAP_HGRID_SIZE) * this.tileSize, this.tileSize, this.tileSize)
+
+    //console.log(screenCoordsFromGridCoords)
+
+    //this.ctx.fillRect(x, y, this.tileSize, this.tileSize)
   }
 
   // MOUSE EVENTS
@@ -224,26 +268,44 @@ export default class GameMap extends Vue {
     ]
 
     // work out the visible chunks and for each cell, draw
-    
+    this.drawChunks()
 
     // highlight the selected cell
-    this.drawTile(offsetSelectedCoord, 'rgb(200, 200, 0)')
+    // this.drawTile(offsetSelectedCoord, 'rgb(200, 200, 0)')
   }
 
-  private drawCellCoords() {
-    // draw a grid - for now it's 20x20
-    for (let y = 0; y < this.mapGridSize; y++) {
-      for (let x = 0; x < this.mapGridSize; x++) {
 
-        console.log(``)
-        
-        //this.drawGridCell([x, y])
+  private drawChunks() {
+    // check boundaries
+    if (!this.visibleChunks) return
+    // get the current required chunk range
+    this.visibleChunks.forEach((key:string) => {
+      // load the chunk (if it exists)
+      const chunk = this.mapStore.mapData[key]
+
+      const chunkOffset = key.split(':')
+      if (!chunk) return      
+     
+      for (let y = 0; y < chunk.length; y++) {
+        for (let x = 0; x < chunk[y].length; x++ ) {
+          // storing data with 0,0 as centre of data-set - need to offset
+          // const chunkArrayCoords = [ x - MAP_HCHUNK_SIZE, y - MAP_HCHUNK_SIZE ]
+          if (chunk[y][x]) {
+            const xOffset = parseInt(chunkOffset[0]) * MAP_CHUNK_SIZE
+            const yOffset = parseInt(chunkOffset[1]) * MAP_CHUNK_SIZE
+            
+            // clumsy as fuck but it works
+            this.ctx.fillStyle = 'yellow'
+            this.ctx.fillRect(((x + this.mapStore.offset[0] + MAP_HGRID_SIZE - MAP_HCHUNK_SIZE + xOffset) * this.tileSize), ((y + this.mapStore.offset[1] + MAP_HGRID_SIZE - MAP_HCHUNK_SIZE + yOffset) * this.tileSize), this.tileSize, this.tileSize)
+          }
+        }
       }
-    }
+    })
+  }
 
-    // axis
-    this.drawLine([this.axisX, 0], [this.axisX, this.height], 'red')
-    this.drawLine([0, this.axisY], [this.width, this.axisY], 'red')
+
+  private startApp() {
+    this.draw()
   }
 
   private loop(timestamp: number) {
@@ -268,7 +330,6 @@ export default class GameMap extends Vue {
 
   private changeOffset(offset:Vector) {
     this.mapStore.setOffset(offset)
-    this.setMapChunkRange()
   }
 
   private getDims() {
@@ -279,10 +340,11 @@ export default class GameMap extends Vue {
     this.left = left
   }
 
+  // track visible chunks for drawing items
   private setMapChunkRange() {
-    const range = getMaxMinGridRange(this.mapStore.offset)
-    this.xMaxMin = range[0]
-    this.yMaxMin = range[1]
+    // set the visible range of map chunks
+    this.visibleChunks = getChunksForRange(getMaxMinGridRange(this.origin))
+    // if anything missing, get the store to load the required chunk
   }
 
   private mounted() {
@@ -296,15 +358,18 @@ export default class GameMap extends Vue {
     this.centerX = this.width / 2
     this.centerY = this.height / 2
 
+    // this.chunk = this.mapStore.mapData.chunks['0:0']
+
     window.requestAnimationFrame(this.loop)
     this.keyHander = document.addEventListener('keypress', this.onKeyPress)
 
-    // this.chunk = this.mapStore.mapData.chunks['0:0']
     this.setMapChunkRange()
+    // this.chunk = this.mapStore.mapData.chunks['0:0']
+    // this.draw()
   }
 
   beforeDestroy() {
-    document.removeEventListener('keypress', this.keyHander)
+    document.removeEventListener('keypress', this.onKeyPress)
   }
 }
 </script>

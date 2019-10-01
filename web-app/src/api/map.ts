@@ -13,7 +13,8 @@ class Map {
 
   public async loadMapChunks(chunks: string[]) {
     if (!chunks) return
-    let mapData = await this.get('mapData')
+    const mapData = await this.get('mapData')
+    if (!mapData) return
     // traverse the required chunks - for each, load the map data if it exists
     return chunks.reduce((prev:Dictionary<MapTile[][]>, key:string) => {
       if (mapData[key]) prev = {
