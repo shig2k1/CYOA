@@ -7,7 +7,7 @@ import Map from '@/classes/map'
 import { Dictionary, MapTile, Vector } from '../../types'
 import { MAP_CHUNK_SIZE } from '../../config'
 
-import { chunkLocalCoords, chunkOffset, getMaxMinGridRange, getChunksForRange } from '../../utils/map.helper'
+import { getMaxMinGridRange, getChunksForRange } from '../../utils/map.helper'
 
 const VuexModule = createModule({
   namespaced: true,

@@ -180,15 +180,6 @@ export default class GameMap extends Vue {
     if (!coords || !this.ctx) return
     this.ctx.fillStyle = fill
     this.ctx.fillRect(coords[0] * this.tileSize, coords[1] * this.tileSize, this.tileSize, this.tileSize)
-
-    //this.ctx.fillRect(((((coords[0] - MAP_HCHUNK_SIZE) + MAP_HGRID_SIZE + this.mapStore.offset[0])) * this.tileSize), (((coords[1] - MAP_HCHUNK_SIZE) + MAP_HGRID_SIZE + this.mapStore.offset[1]) * this.tileSize), this.tileSize, this.tileSize)
-
-
-    //this.ctx.fillRect((coords[0] - MAP_HCHUNK_SIZE) + (MAP_HGRID_SIZE) * this.tileSize, ((coords[1] - MAP_HCHUNK_SIZE) + MAP_HGRID_SIZE) * this.tileSize, this.tileSize, this.tileSize)
-
-    //console.log(screenCoordsFromGridCoords)
-
-    //this.ctx.fillRect(x, y, this.tileSize, this.tileSize)
   }
 
   // MOUSE EVENTS
@@ -271,7 +262,7 @@ export default class GameMap extends Vue {
     this.drawChunks()
 
     // highlight the selected cell
-    // this.drawTile(offsetSelectedCoord, 'rgb(200, 200, 0)')
+    this.drawCell(offsetSelectedCoord, 'lime')
   }
 
 
