@@ -15,6 +15,7 @@
         button(@click="changeName") Change the name
       .map-items
         p items
+        three-js
 </template>
 
 <script lang="ts">
@@ -27,7 +28,7 @@ import MapStore from '../store/modules/map.store'
 
 import GameMap from '@/components/GameMap.vue' // @ is an alias to /src
 import GameTileDetail from '@/components/GameTileDetail.vue'
-import ThreeItem from '@/components/ThreeItem.vue'
+import ThreeJs from '@/components/ThreeJs.vue'
 
 import { chunkLocalCoords, chunkOffset, getChunksForRange, getMaxMinGridRange } from '../utils/map.helper'
 
@@ -35,7 +36,7 @@ import { chunkLocalCoords, chunkOffset, getChunksForRange, getMaxMinGridRange } 
   components: {
     GameMap,
     GameTileDetail,
-    ThreeItem
+    ThreeJs,
   },
 })
 export default class Home extends Vue {
