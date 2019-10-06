@@ -3,45 +3,34 @@
     slot
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { createProxy } from 'vuex-class-component'
+<script>
 
-// import the store and required map module
-import { store } from '../store'
-import MapStore from '../store/modules/map.store'
+import 'three'
+import 'three/OrbitControls'
+import 'three/GLTFLoader'
 
-import { Vector, MapTile } from '../types'
-import { Dictionary } from 'vue-router/types/router'
-import { MAP_CHUNK_SIZE, MAP_GRID_SIZE, MAP_HCHUNK_SIZE, MAP_HGRID_SIZE } from '../config'
-import { chunkLocalCoords, chunkOffset, getMaxMinGridRange, getChunksForRange, visibleOrigin } from '../utils/map.helper'
+export default {
+  data: () => ({
+    $container: null,
+    $scene: null,
+    $renderer: null,
+    $camera: null,
+    $controls: null,
+    entities: [] //<-- array to hold items
+  }),
 
-
-import * as THREE from 'three'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-
-@Component
-export default class GameMap extends Vue {
-  $container: any
-  $scene: any
-  $renderer: any
-  $camera: any
-  $controls: any
-  entities: any = [] //<-- array to hold items
-
-
-  addEntity (entity) {
-    // keep reference
-    this.entities.push (entity)
-    // add to scene
-    this.$scene.add(entity)
-  }
-
-  removeEntity (entity) {
-    console.log('remove!')
-    this.entities = [ ...this.entities.filter(e => e !== entity) ]
-  }
+  methods: {
+    addEntity (entity) {
+      // keep reference
+      this.entities.push (entity)
+      // add to scene
+      this.$scene.add(entity)
+    },
+    removeEntity (entity) {
+      console.log('remove!')
+      this.entities = [ ...this.entities.filter(e => e !== entity) ]
+    }
+  },
 
   mounted () {
 
@@ -66,7 +55,7 @@ export default class GameMap extends Vue {
     this.$camera.position.set( 120, 120, 120 ); // all components equal
     this.$camera.lookAt( this.$scene.position ); // or the origin
 
-    this.$controls = new OrbitControls( this.$camera );
+    this.$controls = new THREE.OrbitControls( this.$camera );
     this.$controls.update()
 
     // var light = new THREE.AmbientLight( 0xBBBBBB )
@@ -92,12 +81,11 @@ export default class GameMap extends Vue {
     this.$container.appendChild(this.$renderer.domElement)
 
     // Instantiate a loader
-    var loader = new GLTFLoader();
-    //loader.crossOrigin = true
+    var loader = new THREE.GLTFLoader();
+    loader.crossOrigin = true
 
     //this.$controls.
-    let plane = new THREE.GridHelper(90, 30)
-    this.$scene.add(plane)
+
 
 
     const loadImage = (imageUrl, coords, rotation = 0) => {

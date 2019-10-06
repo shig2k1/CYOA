@@ -6,16 +6,12 @@
         game-map
         
       .map-detail
-        game-tile-detail
 
-      three-item
-        
-        pre {{ mapStore.selectedCoord }}
-        
-        button(@click="changeName") Change the name
-      .map-items
-        p items
         three-js
+        
+      .map-items
+        game-tile-detail
+        
 </template>
 
 <script lang="ts">
