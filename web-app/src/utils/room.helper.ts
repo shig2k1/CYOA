@@ -35,7 +35,7 @@ function simpleHash (s:string) {
   return String(a);
 };
 
-const ROOM_SEED = 'ABCDE234eds'
+const ROOM_SEED = 'ABCDE'
 
 /*
  build a series of rooms in a grid
