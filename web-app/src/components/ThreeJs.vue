@@ -11,15 +11,15 @@ import { createProxy } from 'vuex-class-component'
 import { store } from '../store'
 import MapStore from '../store/modules/map.store'
 
-import { Vector, MapTile } from '../types'
-import { Dictionary } from 'vue-router/types/router'
+import { Vector, MapTile, Model } from '../types'
 import { MAP_CHUNK_SIZE, MAP_GRID_SIZE, MAP_HCHUNK_SIZE, MAP_HGRID_SIZE } from '../config'
 import { chunkLocalCoords, chunkOffset, getMaxMinGridRange, getChunksForRange, visibleOrigin } from '../utils/map.helper'
-
+import { TILE_DIRECTIONS } from '../enums'
+import { MapTiles } from '../data'
 
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 @Component
 export default class GameMap extends Vue {
@@ -28,6 +28,7 @@ export default class GameMap extends Vue {
   $renderer: any
   $camera: any
   $controls: any
+  $loader: any
   entities: any = [] //<-- array to hold items
 
 
@@ -43,9 +44,45 @@ export default class GameMap extends Vue {
     this.entities = [ ...this.entities.filter(e => e !== entity) ]
   }
 
+  drawModel(name:TILE_DIRECTIONS, coords:Vector) {
+    let model = MapTiles[name]
+    if (model) this.loadImage(model.mesh, coords, model.rotation)
+  }
+
+  loadImage(imageUrl:string, coords:Vector, rotation:number = 0) {
+
+    // Load a glTF resource
+    this.$loader.load( imageUrl, ( gltf ) => {
+      //this.$scene.add( gltf.scene );
+
+      const x = coords[0] * 2
+      const y = coords[1] * 2
+  
+      const pos = new THREE.Vector3( y, 0, x );
+
+      const model = gltf.scene.children[ 0 ];
+      model.position.copy( pos );
+      model.rotation.y =  (Math.PI / 2) * rotation
+
+      this.$scene.add(model)
+    },
+    // called while loading is progressing
+    function ( xhr ) {
+
+      console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+    },
+    // called when loading has errors
+    function ( error ) {
+
+      console.log( 'An error happened', error);
+
+    });
+  }
+
   mounted () {
 
-    const { width, height } = this.$el.parentNode.getBoundingClientRect()
+    const { width, height } = (this.$el.parentNode as any).getBoundingClientRect()
     // Set the scene size.
     const WIDTH = width
     const HEIGHT = height
@@ -92,52 +129,34 @@ export default class GameMap extends Vue {
     this.$container.appendChild(this.$renderer.domElement)
 
     // Instantiate a loader
-    var loader = new GLTFLoader();
+    this.$loader = new GLTFLoader();
     //loader.crossOrigin = true
 
     //this.$controls.
     let plane = new THREE.GridHelper(90, 30)
     this.$scene.add(plane)
 
+    // draw a room
 
-    const loadImage = (imageUrl, coords, rotation = 0) => {
+    this.drawModel(TILE_DIRECTIONS.TOP_RIGHT, [ 3,-3 ])
 
-      // Load a glTF resource
-      loader.load( imageUrl, ( gltf ) => {
-        //this.$scene.add( gltf.scene );
-
-        const x = coords[0] * 2
-        const y = coords[1] * 2
-    
-        const pos = new THREE.Vector3( y, 0, x );
-
-        const model = gltf.scene.children[ 0 ];
-        model.position.copy( pos );
-        model.rotation.y =  (Math.PI / 2) * rotation
-
-        this.$scene.add(model)
-      },
-      // called while loading is progressing
-      function ( xhr ) {
-
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-      },
-      // called when loading has errors
-      function ( error ) {
-
-        console.log( 'An error happened', error);
-
-      });
-    }
+    this.drawModel(TILE_DIRECTIONS.TOP_RIGHT, [ -1,-1 ])
+    this.drawModel(TILE_DIRECTIONS.TOP_MIDDLE, [ 0,-1 ])
+    this.drawModel(TILE_DIRECTIONS.TOP_LEFT, [ 1,-1 ])
+    this.drawModel(TILE_DIRECTIONS.MIDDLE_RIGHT, [ -1,0 ])
+    this.drawModel(TILE_DIRECTIONS.MIDDLE_MIDDLE, [ 0,0 ])
+    this.drawModel(TILE_DIRECTIONS.MIDDLE_LEFT, [ 1,0 ])
+    this.drawModel(TILE_DIRECTIONS.BOTTOM_RIGHT, [ -1,1 ])
+    this.drawModel(TILE_DIRECTIONS.BOTTOM_MIDDLE, [ 0,1 ])
+    this.drawModel(TILE_DIRECTIONS.BOTTOM_LEFT, [ 1,1 ])
 
     // build the room
-    loadImage('room-corner.glb', [ 0, 0 ], 3)
+    /*loadImage('room-corner.glb', [ 0, 0 ], 3)
     loadImage('room-middle.glb', [ 0, -1 ])
     loadImage('room-corner.glb', [ 0, -2 ])
     
     loadImage('room-middle.glb', [ 1, 0 ], 3)
-    loadImage('room-center.glb', [ 1, -1 ])
+    loadImage('room-center.glb', [ 0, 0 ])
     loadImage('room-middle.glb', [ 1, -2 ], 1)
   
     loadImage('room-corner.glb', [ 2, 0 ], 2)
@@ -145,7 +164,7 @@ export default class GameMap extends Vue {
     loadImage('room-corner.glb', [ 2, -2 ], 1)
 
     // load a sprite
-    loadImage('arcade-machine-1.glb', [ 2, -2 ], 2)
+    loadImage('arcade-machine-1.glb', [ 2, -2 ], 2)*/
 
 
     const animate = () => {

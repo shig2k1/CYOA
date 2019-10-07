@@ -51,10 +51,12 @@
     }
 
     private createTile() {
+      let coords = chunkLocalCoords(this.mapStore.selectedCoord)
       let data:IAddTile = {
         chunkOffset: chunkOffset(this.mapStore.selectedCoord),
-        coords: chunkLocalCoords(this.mapStore.selectedCoord),
+        coords,
         tile: {
+          coords,
           name: 'test'
         }
       }

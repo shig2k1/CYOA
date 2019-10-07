@@ -1,3 +1,5 @@
+import Model from './model'
+
 interface Dictionary<t> {
   [key: string]: t,
 }
@@ -32,4 +34,4 @@ interface MapTile {
   name?: string
 }
 
-export { Dictionary, Vector, MapChunk, MapTile, Item, Door, Room }
+export { Dictionary, Vector, MapChunk, MapTile, Item, Door, Room, Model }

@@ -1,9 +1,8 @@
 
 import { Dictionary, MapTile, Vector } from '@/types'
 import { MAP_CHUNK_SIZE } from '@/config'
-
 /*
-  { }
+  Map takes care of locating items within a chunked 0/0 origin tilemap
 */
 
 export default class Map {
