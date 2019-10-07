@@ -34,6 +34,7 @@ import { MAP_CHUNK_SIZE, MAP_GRID_SIZE, MAP_HCHUNK_SIZE, MAP_HGRID_SIZE } from '
 
 
 import { chunkLocalCoords, chunkOffset, getMaxMinGridRange, getChunksForRange, visibleOrigin } from '../utils/map.helper'
+import { buildRoom } from '../utils/room.helper'
 
 const GRID_COLOR = '#AAA'
 
@@ -362,6 +363,7 @@ export default class GameMap extends Vue {
   beforeDestroy() {
     document.removeEventListener('keypress', this.onKeyPress)
   }
+  
 }
 </script>
 

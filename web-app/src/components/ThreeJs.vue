@@ -14,6 +14,8 @@ import MapStore from '../store/modules/map.store'
 import { Vector, MapTile, Model } from '../types'
 import { MAP_CHUNK_SIZE, MAP_GRID_SIZE, MAP_HCHUNK_SIZE, MAP_HGRID_SIZE } from '../config'
 import { chunkLocalCoords, chunkOffset, getMaxMinGridRange, getChunksForRange, visibleOrigin } from '../utils/map.helper'
+import { buildRoom } from '../utils/room.helper'
+
 import { TILE_DIRECTIONS } from '../enums'
 import { MapTiles } from '../data'
 
@@ -45,7 +47,7 @@ export default class GameMap extends Vue {
   }
 
   drawModel(name:TILE_DIRECTIONS, coords:Vector) {
-    let model = MapTiles[name]
+    let model = MapTiles[`r_${name}`]
     if (model) this.loadImage(model.mesh, coords, model.rotation)
   }
 
@@ -138,7 +140,7 @@ export default class GameMap extends Vue {
 
     // draw a room
 
-    this.drawModel(TILE_DIRECTIONS.TOP_RIGHT, [ 3,-3 ])
+    /*this.drawModel(TILE_DIRECTIONS.TOP_RIGHT, [ 3,-3 ])
 
     this.drawModel(TILE_DIRECTIONS.TOP_RIGHT, [ -1,-1 ])
     this.drawModel(TILE_DIRECTIONS.TOP_MIDDLE, [ 0,-1 ])
@@ -148,7 +150,20 @@ export default class GameMap extends Vue {
     this.drawModel(TILE_DIRECTIONS.MIDDLE_LEFT, [ 1,0 ])
     this.drawModel(TILE_DIRECTIONS.BOTTOM_RIGHT, [ -1,1 ])
     this.drawModel(TILE_DIRECTIONS.BOTTOM_MIDDLE, [ 0,1 ])
-    this.drawModel(TILE_DIRECTIONS.BOTTOM_LEFT, [ 1,1 ])
+    this.drawModel(TILE_DIRECTIONS.BOTTOM_LEFT, [ 1,1 ])*/
+
+        
+    let arr = buildRoom(4, 4)
+
+    let offset = -(arr.length / 2)
+
+    for (let y = 0, y2 = offset; y < arr.length; y++, y2++) {
+      for (let x = 0, x2 = offset; x < arr[y].length; x++, x2++) {
+        this.drawModel(arr[y][x], [ x2, y2 ])
+      }
+    }
+
+    console.log(arr)
 
     // build the room
     /*loadImage('room-corner.glb', [ 0, 0 ], 3)
