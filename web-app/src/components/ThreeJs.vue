@@ -14,7 +14,7 @@ import MapStore from '../store/modules/map.store'
 import { Vector, MapTile, Model } from '../types'
 import { MAP_CHUNK_SIZE, MAP_GRID_SIZE, MAP_HCHUNK_SIZE, MAP_HGRID_SIZE } from '../config'
 import { chunkLocalCoords, chunkOffset, getMaxMinGridRange, getChunksForRange, visibleOrigin } from '../utils/map.helper'
-import { buildRoom } from '../utils/room.helper'
+import { buildRoom, seededRoom } from '../utils/room.helper'
 
 import { TILE_DIRECTIONS } from '../enums'
 import { MapTiles } from '../data'
@@ -163,7 +163,7 @@ export default class GameMap extends Vue {
       }
     }
 
-    console.log(arr)
+    console.log(seededRoom())
 
     // build the room
     /*loadImage('room-corner.glb', [ 0, 0 ], 3)
