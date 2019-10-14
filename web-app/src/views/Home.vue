@@ -1,5 +1,54 @@
 <template lang="pug">
-  .game-wrapper
+  .editor-wrapper
+    .left
+      .title Dungeon builder
+      // world map
+      .world-map
+        .sub-title World Map
+        .map.rounded-border test
+
+      // rooms
+      .rooms
+        .sub-title Rooms
+
+        .room-list
+          ul
+            li.active Spawn room | 0, 0
+            li room 1 | 1, 0
+            li room 2 | 1, 1
+
+    .mid
+      .inner
+        // content tabs
+        .content-tabs
+          ul
+            li Ground floor: spawn room
+            li.active Ground floor: room 2
+            li Ground floor: room 3
+            li Ground floor: room 4
+            li Ground floor: room 5
+
+        // room editor
+        .room-editor
+
+          // room map
+          .room-map
+            canvas
+
+          // room properties
+          .room-properties
+            .sub-title selected tile properties
+
+        // global items
+        .global-items
+          .mobs
+            .sub-title mobs
+
+          .items
+            .sub-title items
+
+  
+  //.game-wrapper
     .title-bar
     .main(v-if="mapStore")
       .map-area

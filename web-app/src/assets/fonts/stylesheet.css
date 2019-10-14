@@ -1,0 +1,11 @@
+@font-face {
+    font-family: '8-bit fortress';
+    src: url('8-bit-fortress.eot');
+    src: url('8-bit-fortress.eot?#iefix') format('embedded-opentype'),
+        url('8-bit-fortress.woff2') format('woff2'),
+        url('8-bit-fortress.woff') format('woff'),
+        url('8-bit-fortress.svg#8-bit-fortress') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+

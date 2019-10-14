@@ -36,6 +36,8 @@ function simpleHash (s:string) {
 };
 
 const ROOM_SEED = 'ABCDE'
+const MIN_ROOM_SIZE = 4
+const MAX_ROOM_SIZE = 15
 
 /*
  build a series of rooms in a grid
@@ -55,16 +57,19 @@ function seededRoom () {
 
   for (let i = 0; i < numberOfRooms; i++) {
     let width = parseInt(roomhash) * (i + 1)
-    let height = parseInt(roomhash) * (i + 2)
+    let height = parseInt(roomhash) * (i + 1)
     let ow = width % 3
     let oh = height % 3
-    let rw = `${width}`.replace('0', `1`).substring(ow, ow + 3).split('').reduce((p, c) => p + parseInt(c), 0)
-    let rh = `${height}`.replace('0', `1`).substring(oh, oh + 3).split('').reduce((p, c) => p + parseInt(c), 0)
+    let rw = minMax(Math.floor(`${width}`.substring(ow, ow + 2).split('').reduce((p, c) => p + parseInt(c), 0)))
+    let rh = minMax(Math.floor(`${height}`.substring(oh, oh + 2).split('').reduce((p, c) => p + parseInt(c), 0)))
     rooms.push([rw, rh])
   }
 
   // subdivide the map twice to get (4x4)x4 grid - gives an even distribution for building out a map
   let arr = subdivideArray(rooms).map((v:Vector[]) => subdivideArray(v))
+
+  console.log(JSON.stringify(arr[0]), 2)
+
   // now work out the size of each chunk
   let t = arr.reduce((p, c) => { 
     let b = c.reduce((_p, _c) => arrayDimensions(_c), [ 0, 0 ])
@@ -74,6 +79,12 @@ function seededRoom () {
   console.log(`width: ${t[0]} * height: ${t[1]}`)
 
   return `${numberOfRooms} rooms!`
+}
+
+function minMax(val:number) {
+  if (val < MIN_ROOM_SIZE) val = MIN_ROOM_SIZE
+  else if (val > MAX_ROOM_SIZE) val = MAX_ROOM_SIZE
+  return val
 }
 
 
