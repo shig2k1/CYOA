@@ -5,7 +5,8 @@
       // world map
       .world-map
         .sub-title World Map
-        .map.rounded-border test
+        .map
+          game-map
 
       // rooms
       .rooms

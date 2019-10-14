@@ -79,7 +79,7 @@ export default class GameMap extends Vue {
   // visible chunk addresses
   private visibleChunks: string[] = []
 
-  private canvasSize = 600
+  private canvasSize = 260
 
   // key handler
   private keyHander!: any
@@ -371,7 +371,6 @@ export default class GameMap extends Vue {
 <style scoped lang="scss">
     .game-map-area {
       border: 1px solid gray;
-      padding:20px;
     }
     #game-map {
         background:black;
