@@ -16,10 +16,10 @@ class Map {
     const mapData = await this.get('mapData')
     if (!mapData) return
     // traverse the required chunks - for each, load the map data if it exists
-    return chunks.reduce((prev:Dictionary<MapTile[][]>, key:string) => {
+    return chunks.reduce((prev: Dictionary<MapTile[][]>, key: string) => {
       if (mapData[key]) prev = {
         ...prev,
-        [key]: mapData[key]
+        [key]: mapData[key],
       }
       return prev
     }, {})

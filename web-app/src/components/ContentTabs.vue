@@ -30,8 +30,8 @@ const GRID_COLOR = '#AAA'
 
 @Component
 export default class ContentTabs extends Vue {
-  @Prop() value!: string | null
-  @Prop({ default: () => [] }) items!: string[]
+  @Prop() public value!: string | null
+  @Prop({ default: () => [] }) public items!: string[]
 }
 </script>
 

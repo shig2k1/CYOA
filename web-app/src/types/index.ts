@@ -24,7 +24,7 @@ interface Room {
 }
 
 interface MapChunk {
-  
+
 }
 
 interface MapTile {

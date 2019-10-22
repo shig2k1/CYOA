@@ -40,6 +40,30 @@ const GRID_COLOR = '#AAA'
 
 @Component
 export default class RoomMap extends Vue {
+
+  private get size() { return `${this.canvasSize}px` }
+
+  private get axisX() {
+    return this.centerX + (this.tileSize * this.mapStore.offset[0])
+  }
+
+  private get axisY() {
+    return this.centerY + (this.tileSize * this.mapStore.offset[1])
+  }
+
+  private get origin() {
+    return visibleOrigin(this.mapStore.offset)
+  }
+
+  get chunkoffset() {
+    if (!this.offsetGridCoords) return
+    return chunkOffset(this.offsetGridCoords)
+  }
+
+  get chunkgridxy() {
+    if (!this.offsetGridCoords) return
+    return chunkLocalCoords(this.offsetGridCoords)
+  }
   // instanciate mapStore proxy locally
   private mapStore = createProxy(store, MapStore)
   private value = 'This is a test... not sure about having to mark everything as private or public - that should be implicit'
@@ -92,40 +116,20 @@ export default class RoomMap extends Vue {
   private lastRender = 0
 
   // chunk
-  private chunk:MapTile[][] = []
+  private chunk: MapTile[][] = []
 
-  @Watch('mapStore.offset') onMapOriginChange() {
+  @Watch('mapStore.offset') public onMapOriginChange() {
 
   }
 
 
-  @Watch('mapStore.mapData') onMapDataChange() {
+  @Watch('mapStore.mapData') public onMapDataChange() {
     this.setMapChunkRange()
     this.draw()
   }
 
-  private get size () { return `${this.canvasSize}px` }
-
-  private get axisX() {
-    return this.centerX + (this.tileSize * this.mapStore.offset[0])
-  }
-
-  private get axisY() {
-    return this.centerY + (this.tileSize * this.mapStore.offset[1])
-  }
-
-  private get origin() {
-    return visibleOrigin(this.mapStore.offset)
-  }
-
-  get chunkoffset () {
-    if (!this.offsetGridCoords) return
-    return chunkOffset(this.offsetGridCoords)
-  }
-
-  get chunkgridxy () {
-    if (!this.offsetGridCoords) return
-    return chunkLocalCoords(this.offsetGridCoords)
+  public beforeDestroy() {
+    document.removeEventListener('keypress', this.onKeyPress)
   }
 
   private drawGrid() {
@@ -153,7 +157,7 @@ export default class RoomMap extends Vue {
   private drawGridCell(coords: Vector) {
     const hChunk = Math.floor(MAP_CHUNK_SIZE / 2)
     // const isMapChunkOrigin = (coords[0] + hChunk - this.vpOffset[0]) % MAP_CHUNK_SIZE === hChunk && (coords[1] + hChunk - this.vpOffset[1]) % MAP_CHUNK_SIZE === hChunk
-    return this.drawCell(coords,'gray')
+    return this.drawCell(coords, 'gray')
   }
 
   private drawCell(coords: Vector, color: string) {
@@ -198,15 +202,15 @@ export default class RoomMap extends Vue {
 
       this.mouseGridCoords = [
         Math.floor(this.cursorMapPosition[0] / this.tileSize),
-        Math.floor(this.cursorMapPosition[1] / this.tileSize)
+        Math.floor(this.cursorMapPosition[1] / this.tileSize),
       ]
       this.offsetChunkCoords = [
         offsetX,
-        offsetY
+        offsetY,
       ]
       this.offsetGridCoords = [
         this.mouseGridCoords[0] - offsetX,
-        this.mouseGridCoords[1] - offsetY
+        this.mouseGridCoords[1] - offsetY,
       ]
       this.vpGridXY = [
         this.offsetGridCoords[0] + hGridSize,
@@ -218,7 +222,7 @@ export default class RoomMap extends Vue {
       // gets the position of the cell, relative to the data chunk
       this.internalGridCoords = chunkLocalCoords(this.offsetGridCoords)
     }
-    
+
     if (this.isMouseDown) this.$log.debug('dragging!')
   }
 
@@ -254,9 +258,9 @@ export default class RoomMap extends Vue {
     this.drawTile(this.mouseGridCoords, 'rgba(255, 255, 255, 0.3)')
 
     // figure out selection coordinates
-    const offsetSelectedCoord:Vector = [
+    const offsetSelectedCoord: Vector = [
       this.mapStore.selectedCoord[0] + this.mapStore.offset[0] + this.hMapGridSize,
-      this.mapStore.selectedCoord[1] + this.mapStore.offset[1] + this.hMapGridSize
+      this.mapStore.selectedCoord[1] + this.mapStore.offset[1] + this.hMapGridSize,
     ]
 
     // work out the visible chunks and for each cell, draw
@@ -271,13 +275,13 @@ export default class RoomMap extends Vue {
     // check boundaries
     if (!this.visibleChunks) return
     // get the current required chunk range
-    this.visibleChunks.forEach((key:string) => {
+    this.visibleChunks.forEach((key: string) => {
       // load the chunk (if it exists)
       const chunk = this.mapStore.mapData[key]
 
       const chunkOffset = key.split(':')
-      if (!chunk) return      
-     
+      if (!chunk) return
+
       for (let y = 0; y < chunk.length; y++) {
         for (let x = 0; x < chunk[y].length; x++ ) {
           // storing data with 0,0 as centre of data-set - need to offset
@@ -285,7 +289,7 @@ export default class RoomMap extends Vue {
           if (chunk[y][x]) {
             const xOffset = parseInt(chunkOffset[0]) * MAP_CHUNK_SIZE
             const yOffset = parseInt(chunkOffset[1]) * MAP_CHUNK_SIZE
-            
+
             // clumsy as fuck but it works
             this.ctx.fillStyle = 'yellow'
             this.ctx.fillRect(((x + this.mapStore.offset[0] + MAP_HGRID_SIZE - MAP_HCHUNK_SIZE + xOffset) * this.tileSize), ((y + this.mapStore.offset[1] + MAP_HGRID_SIZE - MAP_HCHUNK_SIZE + yOffset) * this.tileSize), this.tileSize, this.tileSize)
@@ -320,14 +324,14 @@ export default class RoomMap extends Vue {
     }
   }
 
-  private changeOffset(offset:Vector) {
+  private changeOffset(offset: Vector) {
     this.mapStore.setOffset(offset)
   }
 
   private getDims() {
     const { width, height, top, left } = this.canvas.getBoundingClientRect()
     this.width = width
-    this.height = height        
+    this.height = height
     this.top = top
     this.left = left
   }
@@ -345,7 +349,7 @@ export default class RoomMap extends Vue {
     this.ctx = this.canvas.getContext('2d')
 
     this.getDims()
-    
+
     this.tileSize = this.width / this.mapGridSize
     this.centerX = this.width / 2
     this.centerY = this.height / 2
@@ -360,10 +364,6 @@ export default class RoomMap extends Vue {
     // this.draw()
   }
 
-  beforeDestroy() {
-    document.removeEventListener('keypress', this.onKeyPress)
-  }
-  
 }
 </script>
 

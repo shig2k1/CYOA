@@ -25,41 +25,41 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 @Component
 export default class GameMap extends Vue {
-  $container: any
-  $scene: any
-  $renderer: any
-  $camera: any
-  $controls: any
-  $loader: any
-  entities: any = [] //<-- array to hold items
+  public $container: any
+  public $scene: any
+  public $renderer: any
+  public $camera: any
+  public $controls: any
+  public $loader: any
+  public entities: any = [] // <-- array to hold items
 
 
-  addEntity (entity) {
+  public addEntity(entity) {
     // keep reference
     this.entities.push (entity)
     // add to scene
     this.$scene.add(entity)
   }
 
-  removeEntity (entity) {
+  public removeEntity(entity) {
     console.log('remove!')
-    this.entities = [ ...this.entities.filter(e => e !== entity) ]
+    this.entities = [ ...this.entities.filter((e) => e !== entity) ]
   }
 
-  drawModel(name:TILE_DIRECTIONS, coords:Vector) {
-    let model = MapTiles[`r_${name}`]
+  public drawModel(name: TILE_DIRECTIONS, coords: Vector) {
+    const model = MapTiles[`r_${name}`]
     if (model) this.loadImage(model.mesh, coords, model.rotation)
   }
 
-  loadImage(imageUrl:string, coords:Vector, rotation:number = 0) {
+  public loadImage(imageUrl: string, coords: Vector, rotation: number = 0) {
 
     // Load a glTF resource
     this.$loader.load( imageUrl, ( gltf ) => {
-      //this.$scene.add( gltf.scene );
+      // this.$scene.add( gltf.scene );
 
       const x = coords[0] * 2
       const y = coords[1] * 2
-  
+
       const pos = new THREE.Vector3( y, 0, x );
 
       const model = gltf.scene.children[ 0 ];
@@ -69,20 +69,20 @@ export default class GameMap extends Vue {
       this.$scene.add(model)
     },
     // called while loading is progressing
-    function ( xhr ) {
+    function( xhr ) {
 
       console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
     },
     // called when loading has errors
-    function ( error ) {
+    function( error ) {
 
       console.log( 'An error happened', error);
 
     });
   }
 
-  mounted () {
+  public mounted() {
 
     const { width, height } = (this.$el.parentNode as any).getBoundingClientRect()
     // Set the scene size.
@@ -95,11 +95,11 @@ export default class GameMap extends Vue {
     // Create a WebGL renderer, camera
     // and a scene
     this.$renderer = new THREE.WebGLRenderer()
-   
+
     this.$scene = new THREE.Scene()
 
-    var aspect = WIDTH / HEIGHT
-    var d = 10;
+    const aspect = WIDTH / HEIGHT
+    const d = 10;
     this.$camera = new THREE.OrthographicCamera( - d * aspect, d * aspect, d, - d, 1, 1000 );
 
     this.$camera.position.set( 120, 120, 120 ); // all components equal
@@ -110,9 +110,9 @@ export default class GameMap extends Vue {
 
     // var light = new THREE.AmbientLight( 0xBBBBBB )
 
-    var light = new THREE.DirectionalLight(0x999999, 1);
-    //light.castShadow = true;
-    //light.shadowCameraVisible = true;
+    const light = new THREE.DirectionalLight(0x999999, 1);
+    // light.castShadow = true;
+    // light.shadowCameraVisible = true;
     light.position.set(-3, 5, 3);
 
     // this.$scene.add(aLight)
@@ -132,10 +132,10 @@ export default class GameMap extends Vue {
 
     // Instantiate a loader
     this.$loader = new GLTFLoader();
-    //loader.crossOrigin = true
+    // loader.crossOrigin = true
 
-    //this.$controls.
-    let plane = new THREE.GridHelper(90, 30)
+    // this.$controls.
+    const plane = new THREE.GridHelper(90, 30)
     this.$scene.add(plane)
 
     // draw a room
@@ -152,10 +152,10 @@ export default class GameMap extends Vue {
     this.drawModel(TILE_DIRECTIONS.BOTTOM_MIDDLE, [ 0,1 ])
     this.drawModel(TILE_DIRECTIONS.BOTTOM_LEFT, [ 1,1 ])*/
 
-        
-    let arr = buildRoom(4, 4)
 
-    let offset = -(arr.length / 2)
+    const arr = buildRoom(4, 4)
+
+    const offset = -(arr.length / 2)
 
     for (let y = 0, y2 = offset; y < arr.length; y++, y2++) {
       for (let x = 0, x2 = offset; x < arr[y].length; x++, x2++) {
@@ -169,11 +169,11 @@ export default class GameMap extends Vue {
     /*loadImage('room-corner.glb', [ 0, 0 ], 3)
     loadImage('room-middle.glb', [ 0, -1 ])
     loadImage('room-corner.glb', [ 0, -2 ])
-    
+
     loadImage('room-middle.glb', [ 1, 0 ], 3)
     loadImage('room-center.glb', [ 0, 0 ])
     loadImage('room-middle.glb', [ 1, -2 ], 1)
-  
+
     loadImage('room-corner.glb', [ 2, 0 ], 2)
     loadImage('room-middle.glb', [ 2, -1 ], 2)
     loadImage('room-corner.glb', [ 2, -2 ], 1)
@@ -184,8 +184,8 @@ export default class GameMap extends Vue {
 
     const animate = () => {
       requestAnimationFrame(animate)
-      //cube.rotation.x += 0.05
-      //cube.rotation.y += 0.05
+      // cube.rotation.x += 0.05
+      // cube.rotation.y += 0.05
       this.$controls.update()
       this.$renderer.render(this.$scene, this.$camera)
 

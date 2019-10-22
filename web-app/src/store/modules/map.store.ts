@@ -28,24 +28,24 @@ export default class MapStore extends VuexModule {
   @getter public offset: Vector = [0, 0]
 
   public mapStr: string = ''
-  @getter public mapData: Dictionary<(MapTile | number)[][]> = {}
+  @getter public mapData: Dictionary<Array<MapTile | number>[]> = {}
   public name = 'test'
 
   // initial load
-  @mutation public selectTile(coord:Vector) {
+  @mutation public selectTile(coord: Vector) {
     this.selectedCoord = coord
   }
 
-  @action public async initGameMap () {
+  @action public async initGameMap() {
     // this.offset = await mapApi.get('offset') || [ 0, 0 ]
-    let chunks = getChunksForRange(getMaxMinGridRange(this.offset))
+    const chunks = getChunksForRange(getMaxMinGridRange(this.offset))
     if (chunks) this.loadFromLocalStore(chunks)
   }
 
   @action public async loadFromLocalStore(chunks: string[]) {
     this.mapData = {
       ...this.mapData,
-      ...await mapApi.loadMapChunks(chunks) || {}
+      ...await mapApi.loadMapChunks(chunks) || {},
     }
   }
 
@@ -67,7 +67,7 @@ export default class MapStore extends VuexModule {
     if (!chunk) chunk = map.createEmptyChunk(MAP_CHUNK_SIZE, MAP_CHUNK_SIZE)
     // update the chunk data
     chunk[coords[1]][coords[0]] = { ...tile }
-    
+
     // update the map
     this.mapData  = {
       ...this.mapData,

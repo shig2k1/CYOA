@@ -1,7 +1,7 @@
 import { Model, Dictionary } from '@/types'
 import { TILE_DIRECTIONS } from  '@/enums'
 
-const MapTiles:Dictionary<Model> = {
+const MapTiles: Dictionary<Model> = {
   [`r_${TILE_DIRECTIONS.TOP_RIGHT}`]: { mesh: 'room-corner.glb', rotation: 0 },
   [`r_${TILE_DIRECTIONS.TOP_MIDDLE}`]: { mesh: 'room-middle.glb', rotation: 1 },
   [`r_${TILE_DIRECTIONS.TOP_LEFT}`]: { mesh: 'room-corner.glb', rotation: 1 },

@@ -3,10 +3,10 @@ import { Vector } from '../types'
 import { MAP_CHUNK_SIZE, MAP_HCHUNK_SIZE, MAP_GRID_SIZE, MAP_HGRID_SIZE } from '../config'
 
 // get the visible origin from the offset
-function visibleOrigin(offset: Vector):Vector {
+function visibleOrigin(offset: Vector): Vector {
   return [
     -offset[0],
-    -offset[1]
+    -offset[1],
   ]
 }
 
@@ -14,7 +14,7 @@ function visibleOrigin(offset: Vector):Vector {
 function chunkOffset(coords: Vector): Vector {
   return [
     Math.round(coords[0] / MAP_CHUNK_SIZE),
-    Math.round(coords[1] / MAP_CHUNK_SIZE)
+    Math.round(coords[1] / MAP_CHUNK_SIZE),
   ]
 }
 
@@ -27,16 +27,16 @@ function chunkLocalCoords(coords: Vector): Vector {
   if (y < 0) y = MAP_CHUNK_SIZE + y
   return [
     x,
-    y
+    y,
   ]
 }
 
 // get max/min x & y range for visible returns [[xMin, xMax], [yMin, yMax]]
 function getMaxMinGridRange(coords: Vector): Vector[] {
   const startX = coords[0] - MAP_HGRID_SIZE
-  const endX = startX + (MAP_GRID_SIZE-1)
+  const endX = startX + (MAP_GRID_SIZE - 1)
   const startY = coords[1] - MAP_HGRID_SIZE
-  const endY = startY + (MAP_GRID_SIZE-1)
+  const endY = startY + (MAP_GRID_SIZE - 1)
   return [
     [
       startX,
@@ -62,7 +62,7 @@ function getChunksForRange(xyMinMax: Vector[]) {
   const xRange = chunkOffset([xMin, yMin])
   const yRange = chunkOffset([xMax, yMax])
 
-  let requiredChunks = []
+  const requiredChunks = []
 
   // iterate over the range loading all necessary chunks (if they exist)
   for (let x = xRange[0]; x <= yRange[0]; x++) {
