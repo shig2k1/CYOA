@@ -111,14 +111,11 @@ const adjacentRoomsFromMap = function(map: string[][]) {
   const adjacentMap: Vector[][][] = generateEmptyArray(width, height, [])
   map.forEach((row, y) => {
     row.forEach((col, x) => {
-      // console.log(row[])
-      /*
-       [[x-1,y],[x+1,y],[x,y-1],[x,y+1], [...]]
-      */
-      if (x > 0) adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y, x - 1])
-      if (x < width - 1) adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y, x + 1])
-      if (y > 0) adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y - 1, x])
-      if (y < height - 1) adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y + 1, x])
+      if (col === '-') return // ignore empty columns
+      if (x > 0 && map[y][x - 1] !== '-') adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y, x - 1])
+      if (x < width - 1 && map[y][x + 1] !== '-') adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y, x + 1])
+      if (y > 0 && map[y - 1][x] !== '-') adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y - 1, x])
+      if (y < height - 1 && map[y + 1][x] !== '-') adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y + 1, x])
     })
   })
   return adjacentMap
