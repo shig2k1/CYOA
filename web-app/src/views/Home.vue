@@ -20,21 +20,14 @@
 
     .mid
       .inner
-        // content tabs
-        .content-tabs
-          ul
-            li Ground floor: spawn room
-            li.active Ground floor: room 2
-            li Ground floor: room 3
-            li Ground floor: room 4
-            li Ground floor: room 5
+        content-tabs(:items="activeTiles" v-model="selectedActiveTile")
 
         // room editor
         .room-editor
 
           // room map
           .room-map
-            canvas
+            room-map
 
           // room properties
           .room-properties
@@ -73,21 +66,30 @@ import { store } from '../store'
 import MapStore from '../store/modules/map.store'
 
 import GameMap from '@/components/GameMap.vue' // @ is an alias to /src
+import RoomMap from '@/components/RoomMap.vue' // @ is an alias to /src
+import ContentTabs from '@/components/ContentTabs.vue'
 import GameTileDetail from '@/components/GameTileDetail.vue'
 import ThreeJs from '@/components/ThreeJs.vue'
+
+import { IDungeonOptions, BuildDungeon } from '../utils/dungeon.helper'
 
 import { chunkLocalCoords, chunkOffset, getChunksForRange, getMaxMinGridRange } from '../utils/map.helper'
 
 @Component({
   components: {
     GameMap,
+    RoomMap,
     GameTileDetail,
     ThreeJs,
+    ContentTabs
   },
 })
 export default class Home extends Vue {
   // instanciate mapStore proxy locally
   private mapStore = createProxy(store, MapStore)
+
+  activeTiles: string[] = ['a', 'b', 'c']
+  selectedActiveTile: string = this.activeTiles[0]
 
   private changeName() {
     this.mapStore.changeName('FUCK!')
@@ -96,11 +98,15 @@ export default class Home extends Vue {
 
   private mounted() {
     this.mapStore.initGameMap()
+    
+    console.log(BuildDungeon(this.options))
   }
 
   public get mapInterestPoints () {
     return 
   }
+
+  options:IDungeonOptions = { numberOfRooms: 40, maxRoomsWide: 4 }
 }
 </script>
 

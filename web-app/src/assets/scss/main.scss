@@ -98,10 +98,6 @@ $border: 2px solid black;
             height: 100vh;
         }
     }
-
-    .right {
-
-    }
 }
 
 .rooms {
@@ -140,7 +136,14 @@ $border: 2px solid black;
                 background: white;
                 border-bottom: 2px solid white;
             }
-            
+            &:not(.active) {
+                cursor: pointer;
+            }
+            &:hover {
+                margin-top: 4px;
+                height: 36px;
+                line-height: 2em;
+            }
         }
     }
 }

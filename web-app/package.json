@@ -9,6 +9,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "@mdi/font": "^4.5.95",
     "core-js": "^2.6.5",
     "localforage": "^1.7.3",
     "register-service-worker": "^1.6.2",
@@ -32,7 +33,7 @@
     "@vue/cli-service": "^3.0.4",
     "@vue/test-utils": "1.0.0-beta.29",
     "babel-core": "7.0.0-bridge.0",
-    "node-sass": "^4.9.0",
+    "node-sass": "^4.12.0",
     "pug": "^2.0.4",
     "pug-loader": "^2.4.0",
     "pug-plain-loader": "^1.0.0",

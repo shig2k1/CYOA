@@ -10,7 +10,6 @@ import VueLogger from 'vuejs-logger'
 
 // import main
 import '@/assets/scss/main.scss'
-
 import './registerServiceWorker'
 
 Vue.config.productionTip = false
