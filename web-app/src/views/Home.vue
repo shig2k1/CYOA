@@ -30,11 +30,13 @@
             // room-map
             map-data(v-if="mapData" v-model="mapData")
             map-data-grid(v-if="mapDataStage2" v-model="mapDataStage2")
+          
 
           // room properties
           .room-properties
             .sub-title selected tile properties
-
+            map-data(v-if="mapDataStage3" v-model="mapDataStage3")
+            map-data-rooms(v-if="mapDataStage4" v-model="mapDataStage4")
         // global items
         .global-items
           .mobs
@@ -74,8 +76,9 @@ import GameTileDetail from '@/components/GameTileDetail.vue'
 import ThreeJs from '@/components/ThreeJs.vue'
 import MapData from '@/components/MapData.vue'
 import MapDataGrid from '@/components/MapDataGrid.vue'
+import MapDataRooms from '@/components/MapDataRooms.vue'
 
-import { IDungeonOptions, BuildDungeon, BuildDungeonStage2 } from '../utils/dungeon.helper'
+import { IDungeonOptions, BuildDungeon, BuildDungeonStage2, BuildDungeonStage3, BuildDungeonStage4 } from '../utils/dungeon.helper'
 
 import { chunkLocalCoords, chunkOffset, getChunksForRange, getMaxMinGridRange } from '../utils/map.helper'
 
@@ -88,12 +91,15 @@ import { chunkLocalCoords, chunkOffset, getChunksForRange, getMaxMinGridRange } 
     ContentTabs,
     MapData,
     MapDataGrid,
+    MapDataRooms,
   },
 })
 export default class Home extends Vue {
 
   mapData:any = null
   mapDataStage2:any = null
+  mapDataStage3:any = null
+  mapDataStage4:any = null
 
   public get mapInterestPoints() {
     return
@@ -116,6 +122,8 @@ export default class Home extends Vue {
 
     this.mapData = BuildDungeon(this.options)
     this.mapDataStage2 = BuildDungeonStage2(this.mapData)
+    this.mapDataStage3 = BuildDungeonStage3(this.mapDataStage2)
+    this.mapDataStage4 = BuildDungeonStage4(this.mapDataStage2)
   }
 }
 </script>

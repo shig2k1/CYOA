@@ -2,6 +2,7 @@ import map from '@/api/map'
 import router from '@/router'
 import { Vector } from '@/types'
 import { register } from 'register-service-worker'
+import { colors } from 'vuetify/lib'
 
 interface IDungeonOptions {
   numberOfRooms: number
@@ -92,7 +93,7 @@ const generateEmptyArray = function(width: number, height: number, defaultValue:
   return arr
 }
 
-
+// as name suggests, only adds value to an array if it doesn't find it already in there
 const addToArrayIfNotAlreadyThere = function(array:any[], value:any) {
   if (array && array.includes(value)) return array
   else return [ ...array, value ]
@@ -120,6 +121,52 @@ const adjacentRoomsFromMap = function(map: string[][]) {
   })
   return adjacentMap
 }
+
+// recurse the map and get a count of relationships for the supplied coords
+const getCountFromArrayPosition = function(map: Vector[][][], x:number, y:number) {
+  let count = 0
+  map.forEach(row => {
+    row.forEach(col => {
+      if (col.length === 0) return
+      else count += col.filter(val => val[0] === y && val[1] === x).length
+    })
+  })
+  return count
+}
+
+// get array map of relationship counts
+const getRelationshipCountArray = function(map: Vector[][][]) {
+  let newMap:number[][] = []
+
+  map.forEach((row, y) => {
+    let newRow:number[] = []
+    row.forEach((col, x) => {
+      newRow.push(getCountFromArrayPosition(map, x, y))
+    })
+    newMap.push(newRow)
+  })
+
+  return newMap
+}
+
+
+/**
+ * Not all rooms are going to join up, but every room needs at least one connection.
+ */
+const createDoorsFromAdjacentRoomMap = function(map: Vector[][][]) {
+  let newMap:number[][] = []
+
+  map.forEach((row, y) => {
+    let newRow:number[] = []
+    row.forEach((col, x) => {
+      newRow.push(getCountFromArrayPosition(map, x, y))
+    })
+    newMap.push(newRow)
+  })
+
+  return newMap
+}
+
 
 const BuildDungeon = function(options: IDungeonOptions) {
   const map = []
@@ -153,4 +200,14 @@ const BuildDungeonStage2 = function(quadMapArr: string[][], options: IDungeonOpt
   return adjacentRoomsFromMap(quadMapArr)
 }
 
-export { BuildDungeon, BuildDungeonStage2, IDungeonOptions }
+// broken up to make debug easier
+const BuildDungeonStage3 = function(relationShipMap: Vector[][][], options: IDungeonOptions) {
+  return getRelationshipCountArray(relationShipMap)
+}
+
+// broken up to make debug easier
+const BuildDungeonStage4 = function(relationShipMap: Vector[][][], options: IDungeonOptions) {
+  return createDoorsFromAdjacentRoomMap(relationShipMap)
+}
+
+export { BuildDungeon, BuildDungeonStage2, BuildDungeonStage3, BuildDungeonStage4, IDungeonOptions }

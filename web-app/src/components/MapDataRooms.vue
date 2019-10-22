@@ -12,7 +12,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { Vector } from '../types'
 
 @Component
-export default class MapDataGrid extends Vue {
+export default class MapDataRooms extends Vue {
   @Prop() public value!: Vector[][][]
   x = null
   y = null
@@ -23,8 +23,9 @@ export default class MapDataGrid extends Vue {
   }
 
   isActive (x, y) {
-    if (this.x === null || this.y === null) return false
-    return this.value[this.y][this.x].find(vector => vector[0] === y && vector[1] === x)
+    return false
+    // if (this.x === null || this.y === null) return false
+    // return this.value[this.y][this.x].find(vector => vector[0] === y && vector[1] === x)
   }
 
   isSelected (x, y) {
