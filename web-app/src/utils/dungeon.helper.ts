@@ -19,7 +19,7 @@ const makeRooms = function(numberOfRooms: number) {
   return output
 }
 
-// split array of rooms into quad to represent +/- xy
+// split array of rooms into quads to represent +/- xy
 const roomsToQuad = function(rooms: string[]) {
   const grid: any = [[], [], [], []]
   for (let i = 0, j = 0; i < rooms.length; i++, j++) {
@@ -79,11 +79,12 @@ const placeQuadsInMap = function(quads: string[][][], width: number, height: num
   return newGrid
 }
 
+// make an empty array
 const generateEmptyArray = function(width: number, height: number, defaultValue:any) {
   let arr:any[][] = []
-  for (let y = 0; y < width; y++) {
+  for (let y = 0; y < height; y++) {
     let row:any[] = []
-    for (let x = 0; x < height; x++) {
+    for (let x = 0; x < width; x++) {
       row.push(defaultValue)
     }
     arr.push(row)
@@ -105,18 +106,19 @@ const addToArrayIfNotAlreadyThere = function(array:any[], value:any) {
  *  3: y + 1, x,
  * ] */
 const adjacentRoomsFromMap = function(map: string[][]) {
-  const height = map.length - 1
-  const width = map[0].length - 1
+  const height = map.length
+  const width = map[0].length
   const adjacentMap: Vector[][][] = generateEmptyArray(width, height, [])
   map.forEach((row, y) => {
     row.forEach((col, x) => {
+      // console.log(row[])
       /*
        [[x-1,y],[x+1,y],[x,y-1],[x,y+1], [...]]
       */
       if (x > 0) adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y, x - 1])
-      if (x < width) adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y, x + 1])
+      if (x < width - 1) adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y, x + 1])
       if (y > 0) adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y - 1, x])
-      if (y < height) adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y + 1, x])
+      if (y < height - 1) adjacentMap[y][x] = addToArrayIfNotAlreadyThere(adjacentMap[y][x], [y + 1, x])
     })
   })
   return adjacentMap
@@ -148,5 +150,10 @@ const BuildDungeon = function(options: IDungeonOptions) {
   return quadMapArr
 }
 
+// broken up to make debug easier
+const BuildDungeonStage2 = function(quadMapArr: string[][], options: IDungeonOptions) {
 
-export { BuildDungeon, IDungeonOptions }
+  return adjacentRoomsFromMap(quadMapArr)
+}
+
+export { BuildDungeon, BuildDungeonStage2, IDungeonOptions }
