@@ -9,6 +9,20 @@ interface IDungeonOptions {
   maxRoomsWide: number
 }
 
+
+function isEven (value: number) {
+  return value % 2 === 0
+}
+
+function halve (value: number) {
+  return value > 0 ? value / 2 : 0
+}
+
+function hasValue (map:any[][][], x:number, y:number) {
+  return map[y] && map[y][x] && map[y][x].length > 0
+}
+
+
 const ALPHA = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '?','A','B']
 
 // generate an array of rooms
@@ -134,6 +148,20 @@ const getCountFromArrayPosition = function(map: Vector[][][], x:number, y:number
   return count
 }
 
+// recurse the map and get all relationships for the supplied coords
+const getRelatedCoordsFromArrayPosition = function(map: Vector[][][], x:number, y:number) {
+  let coords:Vector[] = []
+  map.forEach((row, _y) => {
+    row.forEach((col, _x) => {
+      if (col.length === 0) return
+      else {
+        col.forEach(val => { if (val[0] === y && val[1] === x) coords.push([_y, _x]) })
+      }
+    })
+  })
+  return coords
+}
+
 // get array map of relationship counts
 const getRelationshipCountArray = function(map: Vector[][][]) {
   let newMap:number[][] = []
@@ -154,17 +182,51 @@ const getRelationshipCountArray = function(map: Vector[][][]) {
  * Not all rooms are going to join up, but every room needs at least one connection.
  */
 const createDoorsFromAdjacentRoomMap = function(map: Vector[][][]) {
-  let newMap:number[][] = []
+  let newMap:Vector[][][] = []
 
   map.forEach((row, y) => {
-    let newRow:number[] = []
+    let newRow:Vector[][] = []
     row.forEach((col, x) => {
-      newRow.push(getCountFromArrayPosition(map, x, y))
+      let b = (Math.random() * 20) > 10
+      let rel = getRelatedCoordsFromArrayPosition(map, x, y)
+      if (rel.length > 0)
+      newRow.push(rel.filter(v => true))
+
+      if (b) newRow.push(col)
+      
+      //newRow.push(getRelatedCoordsFromArrayPosition(map, x, y))
     })
     newMap.push(newRow)
   })
 
   return newMap
+}
+
+// this expands the array and shows the connections between rooms
+// makes it easier to debug room link generation
+const buildRoomConnectionsMap = function(map: Vector[][][]) {
+  if (!map) return []
+  let grid = []
+  for (let y = 0; y < map.length * 2; y++) {
+    let row = []
+    for (let x = 0; x < map[0].length * 2; x++) {
+      if (isEven(y) && isEven(x)) { //  both even = room row
+        row.push(map[halve(y)][halve(x)])
+      } else if (!isEven(y) && !isEven(x)) { // both odd = x
+        row.push('x')
+      } else { // mismatched = linkage
+        // if x is even, the linkage is vertical
+        // if x, y-1 & x, y+1 both have values, link them
+        if (isEven(x) && hasValue(map, halve(x), halve(y-1)) && hasValue(map, halve(x), halve(y+1))) row.push('|')
+        // if x is odd, the linkage is horizontal
+        // if y, x+1 & y, x-1 both have values, link them
+        else if (!isEven(x) && hasValue(map, halve(x-1), halve(y)) && hasValue(map, halve(x+1), halve(y))) row.push('-')
+        else row.push('o')
+      }
+    }
+    grid.push(row)
+  }
+  return grid
 }
 
 
@@ -207,7 +269,7 @@ const BuildDungeonStage3 = function(relationShipMap: Vector[][][], options: IDun
 
 // broken up to make debug easier
 const BuildDungeonStage4 = function(relationShipMap: Vector[][][], options: IDungeonOptions) {
-  return createDoorsFromAdjacentRoomMap(relationShipMap)
+  return buildRoomConnectionsMap(relationShipMap)
 }
 
 export { BuildDungeon, BuildDungeonStage2, BuildDungeonStage3, BuildDungeonStage4, IDungeonOptions }

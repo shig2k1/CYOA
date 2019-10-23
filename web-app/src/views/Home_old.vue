@@ -1,17 +1,64 @@
 <template lang="pug">
   .editor-wrapper
-    
+    .left
+      .title Dungeon builder
+      // world map
+      .world-map
+        .sub-title World Map
+        .map
+          game-map
 
-    // room-map
-    map-data(v-if="mapData" v-model="mapData")
-    map-data-grid(v-if="mapDataStage2" v-model="mapDataStage2")
+      // rooms
+      .rooms
+        .sub-title Rooms
+
+        .room-list
+          ul
+            li.active Spawn room | 0, 0
+            li room 1 | 1, 0
+            li room 2 | 1, 1
+
+    .mid
+      .inner
+        content-tabs(:items="activeTiles" v-model="selectedActiveTile")
+
+        // room editor
+        .room-editor
+
+          // room map
+          .room-map
+            // room-map
+            map-data(v-if="mapData" v-model="mapData")
+            map-data-grid(v-if="mapDataStage2" v-model="mapDataStage2")
+          
+
+          // room properties
+          .room-properties
+            .sub-title selected tile properties
+            map-data(v-if="mapDataStage3" v-model="mapDataStage3")
+            map-data-rooms(v-if="mapDataStage2" v-model="mapDataStage2")
+        // global items
+        .global-items
+          .mobs
+            .sub-title mobs
+
+          .items
+            .sub-title items
+
   
+  //.game-wrapper
+    .title-bar
+    .main(v-if="mapStore")
+      .map-area
+        game-map
+        
+      .map-detail
 
-
-    map-data(v-if="mapDataStage3" v-model="mapDataStage3")
-    map-data-rooms(v-if="mapDataStage4" v-model="mapDataStage4")
-
-
+        three-js
+        
+      .map-items
+        game-tile-detail
+        
 </template>
 
 <script lang="ts">
