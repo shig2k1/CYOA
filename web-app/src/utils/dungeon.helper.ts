@@ -202,6 +202,35 @@ const createDoorsFromAdjacentRoomMap = function(map: Vector[][][]) {
   return newMap
 }
 
+
+const removeRoomLinkageOrNot = function (relationships: Vector[]) {
+
+}
+
+const selectivelyDeleteRoomLinkages = function (map: Vector[][][]) {
+  // does the room have more than one relationship?
+
+  // for each relationship
+
+  // is this the last one? - are there any others?
+  console.log('cell', map[2][4])
+
+  let x = 4
+  let y = 2
+
+  // for this room, check all the connecting rooms
+  map[y][x] = map[y][x].reduce((prev:Vector[], current:Vector) => {
+    // get the number of connections excluding the current room; if it's more than zero, decide whether to remove this link or not...
+    let adjacentRooms = map[current[0]][current[1]].filter(coords => !(coords[0] === y && coords[1] === x))
+    if (adjacentRooms.length > 1) return [ ...prev ]
+    else return [ ...prev, current ]
+  }, [])
+
+  // console.log(cell)
+
+  return map
+}
+
 // this expands the array and shows the connections between rooms
 // makes it easier to debug room link generation
 const buildRoomConnectionsMap = function(map: Vector[][][]) {
@@ -258,7 +287,6 @@ const BuildDungeon = function(options: IDungeonOptions) {
 
 // broken up to make debug easier
 const BuildDungeonStage2 = function(quadMapArr: string[][], options: IDungeonOptions) {
-
   return adjacentRoomsFromMap(quadMapArr)
 }
 
@@ -269,7 +297,7 @@ const BuildDungeonStage3 = function(relationShipMap: Vector[][][], options: IDun
 
 // broken up to make debug easier
 const BuildDungeonStage4 = function(relationShipMap: Vector[][][], options: IDungeonOptions) {
-  return buildRoomConnectionsMap(relationShipMap)
+  return buildRoomConnectionsMap(selectivelyDeleteRoomLinkages(relationShipMap))
 }
 
 export { BuildDungeon, BuildDungeonStage2, BuildDungeonStage3, BuildDungeonStage4, IDungeonOptions }
