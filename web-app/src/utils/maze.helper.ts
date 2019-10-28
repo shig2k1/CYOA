@@ -2,7 +2,11 @@
 // then it walks back to the point at which it has a cell with an adjacent tile it hasn't built a route from
 // and walks back from there 
 
-function newMaze(x:number, y:number) {
+import SeededRandom from '../utils/seeded-rnd.helper'
+
+function newMaze(x:number, y:number, seed: number) {
+  // create seeded randomiser for guaranteed random results :-)
+  let rnd = new SeededRandom(seed)
   
   // establish variables and starting grid
   const totalCells = x*y
@@ -18,7 +22,7 @@ function newMaze(x:number, y:number) {
   }
 
   // set a random position to start from
-  let currentCell:any = [Math.floor(Math.random()*y), Math.floor(Math.random()*x)]
+  let currentCell:any = [Math.floor(rnd.nextFloat()*y), Math.floor(rnd.nextFloat()*x)]
   // register starting point in path array
   let path = [currentCell]
   // mark coord as visited
@@ -28,7 +32,7 @@ function newMaze(x:number, y:number) {
 
   // loop through all the available cell positions
   while(visited < totalCells) {
-    // determine neighbouring cells
+    // determine & store neighbouring cells
     // [*][^][*]
     // [<][o][>]
     // [*][v][*]
@@ -47,7 +51,7 @@ function newMaze(x:number, y:number) {
     // if at least one active neighbour has been found
     if (neighbours.length) {
       // choose one of the neighbours at random
-      let next = neighbours[Math.floor(Math.random()*neighbours.length)]
+      let next = neighbours[Math.floor(rnd.nextFloat()*neighbours.length)]
 
       // remove the wall between the current cell and the chosen neighbouring cell
       cells[currentCell[0]][currentCell[1]][next[2]] = 1

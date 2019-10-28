@@ -19,8 +19,6 @@ import MazeCss from '@/components/MazeCss.vue'
 
 import { newMaze } from '../utils/maze.helper'
 
-import seededRandom from '../utils/seeded-rnd.helper'
-
 @Component({
   components: {
     MazeCss
@@ -49,7 +47,7 @@ export default class Home extends Vue {
   private mounted() {
     this.mapStore.initGameMap()
 
-    this.mapData = newMaze(5, 5)
+    this.mapData = newMaze(20, 20, 212331)
   }
 }
 </script>
