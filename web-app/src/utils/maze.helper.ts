@@ -5,7 +5,7 @@
 import SeededRandom from '../utils/seeded-rnd.helper'
 import { Vector } from '@/types'
 
-let rnd = new SeededRandom(123154)
+let rnd = new SeededRandom(13)
 
 type cell = [ number, number, number, number ]
 // 1. place a random number of rooms in the available area
@@ -56,49 +56,48 @@ function newMaze(x:number, y:number, seed: number) {
   let cells = emptyArray(y, x, 0)
   let unvis = emptyArray(y, x, 1)
 
-  const maxAttempts = 40
+  const maxAttempts = 3000
   const roomMinSize = 3
-  const roomMaxSize = 5
+  const roomMaxSize = 7
   const diff = roomMaxSize - roomMinSize
   const roomGap = 2
   let attempts = 0
+  let visited = 1
+
   // place some rooms
   while (attempts < maxAttempts) {
     // get the important dimensions for a room
-    const start:Vector = [Math.floor(rnd.nextFloat() * y), Math.floor(rnd.nextFloat() * x)]
-    const width = roomMinSize + Math.floor(rnd.nextFloat() * diff)
-    const height = roomMinSize + Math.floor(rnd.nextFloat() * diff)
+    const start:Vector = [Math.floor(rnd.nextFloat() * y), Math.floor(rnd.nextFloat() * x)] // random coords
+    const width = roomMinSize + Math.floor(rnd.nextFloat() * diff)                          // random width
+    const height = roomMinSize + Math.floor(rnd.nextFloat() * diff)                         // random height
     const end:Vector = [start[0] + height, start[1] + width] 
-    // now check that the room doesn't extend into already used territory
-    let room = Array() // <-- store the room coordinates
-    let path = Array() // <-- store the path
-    
-    // if the range is outside the size of the array, or if it's been visited already, don't bother trying
     const startY = start[0] >= roomGap ? start[0] - roomGap : start[0]
     const endY = end[0] + roomGap < y ? end[0] + roomGap : end[0]
     const startX = start[1] >= roomGap ? start[1] - roomGap : start[1]
     const endX = end[1] + roomGap < x ? end[1] + roomGap : end[1]
+    // now check that the room doesn't extend into already used territory
+    // if the range is outside the size of the array, or if it's been visited already, don't bother trying
     if (endY < y && endX < x && isRangeEmpty(unvis, [startY, startX], [endY, endX])) {
       console.log('build a room!', attempts, `${width} x ${height}`)
       for (let j = start[0]; j < end[0]; j++) {
         for (let i = start[1]; i < end[1]; i++) {
           let cell = [1, 1, 1, 1]
           // if first col
-          if (j === 0) cell[0] = 0
-          //else if (j === end[1]) cell[3] = 0
+          if (j === start[0]) cell[0] = 0
+          else if (j === end[0] - 1) cell[2] = 0
           // if first row
-          //if (i === 0) cell[1] = 0
+          if (i === start[1]) cell[3] = 0
           // if last row
-          //else if (i === end[0]) cell[2] = 0
+          else if (i === end[1] - 1) cell[1] = 0
           // mark cell as visited
           unvis[j][i] = false
           cells[j][i] = cell
+          visited += 1
         }
       }
     } else console.log('abandon', attempts)
     attempts += 1
   }
-
 
 
   // set a random position to start from
@@ -108,8 +107,7 @@ function newMaze(x:number, y:number, seed: number) {
   // mark coord as visited
   unvis[currentCell[0]][currentCell[1]] = false
   // start count of visited cells
-  let visited = 1
-
+  
   const noAttempts = 10
   const rMaxSize = 10
   const rMinSize = 4
@@ -117,7 +115,7 @@ function newMaze(x:number, y:number, seed: number) {
   cells = placeRooms(cells, noAttempts, rMinSize, rMaxSize)
 
   // loop through all the available cell positions
-  /*while(visited < totalCells) {
+  while(visited < totalCells) {
     // determine & store neighbouring cells
     // [*][^][*]
     // [<][o][>]
@@ -151,7 +149,7 @@ function newMaze(x:number, y:number, seed: number) {
     }
     // otherwise go back up a step and keep going
     else currentCell = path.pop()
-  }*/
+  }
   return cells
 }
 
