@@ -27,6 +27,7 @@ class SeededRandom {
   }
 
   constructor (seed:number) {
+    // either use a supplied seed, or randomise one
     this.state = seed ? seed : Math.floor(Math.random() * this.m - 1)
   }
 }
