@@ -57,28 +57,31 @@ function newMaze(x:number, y:number, seed: number) {
   let unvis = emptyArray(y, x, 1)
 
   const maxAttempts = 3000
-  const roomMinSize = 3
-  const roomMaxSize = 7
+  const roomMinSize = 10
+  const roomMaxSize = 40
   const diff = roomMaxSize - roomMinSize
   const roomGap = 2
   let attempts = 0
   let visited = 1
 
+  // 0 based array
+  const w = x - 1
+  const h = y - 1
+
   // place some rooms
   while (attempts < maxAttempts) {
     // get the important dimensions for a room
-    const start:Vector = [Math.floor(rnd.nextFloat() * y), Math.floor(rnd.nextFloat() * x)] // random coords
-    const width = roomMinSize + Math.floor(rnd.nextFloat() * diff)                          // random width
-    const height = roomMinSize + Math.floor(rnd.nextFloat() * diff)                         // random height
-    const end:Vector = [start[0] + height, start[1] + width] 
+    const start: Vector = [Math.floor(rnd.nextFloat() * w), Math.floor(rnd.nextFloat() * h)] // random coords
+    const width = roomMinSize + Math.floor(rnd.nextFloat() * diff)                           // random width
+    const height = roomMinSize + Math.floor(rnd.nextFloat() * diff)                          // random height
+    const end: Vector = [start[0] + height, start[1] + width] 
     const startY = start[0] >= roomGap ? start[0] - roomGap : start[0]
-    const endY = end[0] + roomGap < y ? end[0] + roomGap : end[0]
+    const endY = end[0] + roomGap < h ? end[0] + roomGap : end[0]
     const startX = start[1] >= roomGap ? start[1] - roomGap : start[1]
-    const endX = end[1] + roomGap < x ? end[1] + roomGap : end[1]
+    const endX = end[1] + roomGap < w ? end[1] + roomGap : end[1]
     // now check that the room doesn't extend into already used territory
     // if the range is outside the size of the array, or if it's been visited already, don't bother trying
     if (endY < y && endX < x && isRangeEmpty(unvis, [startY, startX], [endY, endX])) {
-      console.log('build a room!', attempts, `${width} x ${height}`)
       for (let j = start[0]; j < end[0]; j++) {
         for (let i = start[1]; i < end[1]; i++) {
           let cell = [1, 1, 1, 1]
@@ -95,13 +98,12 @@ function newMaze(x:number, y:number, seed: number) {
           visited += 1
         }
       }
-    } else console.log('abandon', attempts)
+    }
     attempts += 1
   }
 
-
   // set a random position to start from
-  let currentCell:any = [Math.floor(rnd.nextFloat()*y), Math.floor(rnd.nextFloat()*x)]
+  let currentCell:any = [Math.floor(rnd.nextFloat()*h), Math.floor(rnd.nextFloat()*w)]
   // register starting point in path array
   let path = [currentCell]
   // mark coord as visited

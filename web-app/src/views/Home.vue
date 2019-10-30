@@ -47,7 +47,7 @@ export default class Home extends Vue {
   private mounted() {
     this.mapStore.initGameMap()
 
-    this.mapData = newMaze(20, 20, 212331)
+    this.mapData = newMaze(140, 80, 212331)
   }
 }
 </script>
